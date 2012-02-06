@@ -1,0 +1,719 @@
+\documentclass[a4paper, 10pt]{article}
+
+% \usepackage{verbatim}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+
+\usepackage{float}
+
+\usepackage{hyperref}
+
+\title{SensorLab VSN open source development environment setup manual for Linux based development}
+\author{Zoltan Padrah}
+
+\begin{document}
+
+% title page
+\begin{titlepage}
+    \begin{center}
+    \textbf{\Large ``Jožef Stefan'' Institute \\[2mm]
+        Department of Communication Systems}\\
+        
+    \vfill
+
+    \textbf{\huge SensorLab VSN open source development environment setup manual 
+        for Linux based development}\\[1.5cm]
+        
+    
+    \textbf{ \Large
+    version 0.01}\\[1cm]
+    
+    \textnormal{\Large
+    by Zoltan Padrah}\\[1cm]
+    
+    \vfill
+    
+    \textnormal{\large
+    \today\\[1cm]
+    }
+    \end{center}
+\end{titlepage}
+
+
+\section{Introduction}
+
+This document describes the installation of the development tools for
+Versatile Sensor Node (VSN) on a GNU/Linux operating system.
+The exact steps are performed on Ubuntu 10.10, 32 bit distribution, 
+but the document should be applicable to any distribution.
+Besides distribution-specific instructions, 
+generic steps will be also described.
+
+The installation consists of the following steps:
+	\begin{enumerate}
+	\item Preparing the system and installing custom software
+		\begin{enumerate}
+		\item Setting up \verb+bash+ as the default shell in the system 
+		\item Installing the Codesourcery Lite toolchain
+		\item Inserting the directory of the Codesourcery toolchain in the \verb+PATH+
+		\end{enumerate}
+	\item Installing programs provided as packages by the distribution
+		\begin{enumerate}
+		\item Eclipse
+		\item openOCD
+		\item gtkterm
+		\end{enumerate}
+	\item Installing Eclipse plugins for
+		\begin{enumerate}
+		\item Subversive SVN support
+		\item GNU ARM C/C++ development support
+		\item Zylin Embedded CDT
+		\end{enumerate}
+	\item Testing the setup
+		\begin{enumerate}
+		\item Creating a new project and importing the source code
+		\item Compiling the source
+		\item Uploading to the device
+		\item Testing debugging facilities
+		\end{enumerate}
+	\end{enumerate}
+
+\newpage
+
+\tableofcontents
+\newpage
+
+\listoffigures
+\newpage
+
+\section*{List of Abbreviations}
+	\begin{tabular}{ l l }
+    CDT	    & C/C++ Development Tooling \\
+    SVN     & Apache Subversion \\
+    VSN     & Versatile Sensor Node \\
+	\end{tabular}
+\newpage
+
+
+\section{Preparing the system and installing custom software}
+
+% This section includes special steps, that
+
+\subsection{Setting up bash as the default shell in the system}
+
+In order to be able to run in Eclipse external programs from special locations
+(in our case, the compiler and other needed tools),
+the default shell for script execution must be changed.
+Otherwise the default system shell (dash) will be launched by eclipse, 
+and the compiler won't be found.
+
+This can be achieved by launching Applications $\rightarrow$ Accessories $\rightarrow$ Terminal,
+copying the following command in it:
+
+\begin{verbatim}
+sudo dpkg-reconfigure dash
+\end{verbatim}
+
+and pressing Enter.
+
+You will be asked for your password, 
+and after that a question will be presented, asking 
+if dash should be installed as default system shell.
+See Figure \ref{fig:set-dash-default}.
+Select \emph{No}, and press enter.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/set-dash-default.png}
+        \caption{Setting the default shell to bash, instead of dash}
+        \label{fig:set-dash-default}
+    \end{figure}
+
+Finally close the terminal window.
+In order to apply these changes, you must either log out and log in,
+or launch eclipse from a terminal.
+Otherwise you will get errors when you are trying to compile the source code.
+It is recommended to log out and log in after 
+competing section \ref{sect:change-path}, in order to avoid one extra logout and login.
+
+\subsection{Installing the Codesourcery Lite toolchain}
+
+The Codesourcery Lite toolchain contains 
+the compiler, linker, debugger, and other utilities needed for 
+ARM development.
+
+Go to 
+\url{http://www.codesourcery.com/sgpp/lite/arm/portal/subscription?@template=lite},
+select \emph{EABI} as Target OS, and click on the 
+\emph{All versions} link.
+% \emph{Sourcery G++ Lite \textit{version}} link.
+As of date of writing, the latest version is 2010.09-51, but
+due to compatibility problems during debugging, the recommended version is \emph{2010q1-188}.
+For details, see section \ref{sect:gdb-problems} in Troubleshooting part.
+The direct link to the recommended version is 
+\url{http://www.codesourcery.com/sgpp/lite/arm/portal/release1294}.
+
+On the webpage, select \emph{IA32 GNU/Linux TAR},
+and save the received file.
+Next, open the file, and extract its contents into your home folder.
+This way, you should have a folder named arm-\textit{version} in your home directory.
+In this case, the folder is called arm-2010q1.
+
+The next step is to make the system know about the location of the tools; 
+this is achieved by setting up the PATH for the current user.
+
+\subsection{Inserting the directory of the Codesourcery toolchain in the PATH}
+
+    \label{sect:change-path}
+The \verb+PATH+ variable stores a list of directories, where various 
+program executable can be found. In order to make Eclipse to know about the 
+ARM development tools, the directory containing the tools must be inserted 
+in this list.
+    
+Select from the menu Applications $\rightarrow$ Accessories $\rightarrow$ Text Editor,
+and click open. Navigate to your home folder, then right click on the file list,
+and select from the menu \emph{Show hidden files}. This operation is depicted on Figure
+\ref{fig:show-hidden-files}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/show-all-files.png}
+        \caption{Opening hidden files for editing}
+        \label{fig:show-hidden-files}
+    \end{figure}
+
+From the list, select the file \verb+.bashrc+. Note that hidden files in Linux
+have their name starting with a dot (.).
+
+Select the file called \verb+.bashrc+ and insert the following text in it, 
+close to the beginning:
+
+\begin{verbatim}
+export PATH=$PATH:$HOME/arm-2010q1/bin
+\end{verbatim}
+
+See Figure \ref{fig:editing-bashrc} for example. If you selected different CodeSourcery version,
+then replace the text \verb+2010q1+ accordingly.
+
+    \begin{figure}[H]
+    \centering
+            % TODO edit picture
+        \includegraphics[width=\textwidth]{./png-install-guide/editing-bashrc.png}
+        \caption{Editing .bashrc}
+        \label{fig:editing-bashrc}
+    \end{figure}
+
+Save the file and close the text editor.
+After competing these operations, and before launching Eclipse, it is needed to
+log out and log in back, in order to apply the performed changes.
+
+\section{Installing programs provided as packages by the distribution}
+
+Programs provided by Linux distributions can be installed by using the package management system.
+On Ubuntu, the Synaptic package manager is recommended. 
+Other distributions have equivalent tools for package management.
+
+Open Synaptic by selecting in the menu System $\rightarrow$ Administration $\rightarrow$
+Synaptic Package Manager.
+
+\subsection{Eclipse}
+
+In Synaptic select Edit $\rightarrow$ Search, or Ctrl+F, and enter \verb+eclipse+ 
+in the search box. Right click the package called 
+\verb+eclipse-cdt+ and select \emph{Mark for installation}. 
+See Figure \ref{fig:synaptic-eclipse}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/synaptic-eclipse.png}
+        \caption{Selecting eclipse-cdt for installation}
+        \label{fig:synaptic-eclipse}
+    \end{figure}
+
+After this a dialog should pop up, asking if the other, needed packages should be installed,
+see Figure \ref{fig:synaptic-eclipse-extra-packages.png}. Click \emph{Mark}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.5\textwidth]{./png-install-guide/synaptic-eclipse-extra-packages.png}
+        \caption{Extra packages required by eclipse-cdt}
+        \label{fig:synaptic-eclipse-extra-packages.png}
+    \end{figure}
+
+\subsection{openOCD}
+
+Still in Synaptic, search for package called \verb+openocd+, 
+and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/synaptic-openocd.png}
+        \caption{Selecting openocd for installation}
+        \label{fig:synaptic-openocd}
+    \end{figure}
+
+\subsection{GtkTerm}
+
+Optionally, install a program for communicating on the RS232 port, 
+connected to the VSN.
+Gtkterm is one viable option.
+Search for \verb+gtkterm+ on Synaptic, and select it for installation.
+See Figure \reg{fig:synaptic-gtkterm}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/synaptic-gtkterm.png}
+        \caption{Selecting gtkterm for installation}
+        \label{fig:synaptic-gtkterm}
+    \end{figure}
+
+The next step is to actually perform the installation of the above mentioned programs.
+
+\subsection{Performing the actual installation}
+
+Finally, click \emph{Apply} in Synaptic.
+A window as the one shown on Figure \ref{fig:synaptic-apply-changes.png}
+should appear.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/synaptic-apply-changes.png}
+        \caption{Selecting openocd for installation}
+        \label{fig:synaptic-apply-changes.png}
+    \end{figure}
+
+Click \emph{Apply}, wait for the installation to finish, and close Synaptic.
+
+\section{Installing Eclipse plugins}
+
+First, start Eclipse, by selecting in the menu Applications $\rightarrow$
+Programming $\rightarrow$ Eclipse.
+
+After Eclipse starts, it will ask for a workspace, as shown on Figure \ref{fig:eclipse-workspace}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/eclipse-workspace.png}
+        \caption{Selecting Eclipse workspace}
+        \label{fig:eclipse-workspace}
+    \end{figure}
+
+The default workspace location should be good in most cases, so click \emph{OK}.
+
+In Eclipse, select in the menu Help $\rightarrow$ Install new Software..., as shown in
+Figure \ref{fig:eclipse-update}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/eclipse-update.png}
+        \caption{Search for Eclipse plugins to install}
+        \label{fig:eclipse-update}
+    \end{figure}
+
+
+% Galileo Update Site - http://download.eclipse.org/releases/galileo/
+
+\subsection{Subversive SVN suport}
+
+
+In the \emph{Work with} field, insert the main eclipse update site;
+for the Galileo release, it is
+\url{http://download.eclipse.org/releases/galileo/}.
+
+In the search filter, enter the text \emph{subversive};
+see Figure \ref{fig:eclipse-subversive}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/eclipse-subversive.png}
+        \caption{Selecting Subversion support for Eclipse}
+        \label{fig:eclipse-subversive}
+    \end{figure}
+    
+Check the \emph{Subversive SVN Integration} plugin, and click \emph{Next},
+\emph{Next}, select that you accept the license and click \emph{Finish}.
+
+When Eclipse asks about restarting the IDE, click \emph{Yes}.
+
+On the next start, the Subversive plugin will prompt for selecting
+SVN connectors, as shown on Figure \ref{fig:eclipse-subversive-setup}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/eclipse-subversive-setup.png}
+        \caption{Selecting Subversion connectors for Eclipse}
+        \label{fig:eclipse-subversive-setup}
+    \end{figure}
+
+
+Select \emph{SVN Kit 1.3.0}, and click \emph{Finish}. Next, some additional plugins
+will be installed. 
+Select \emph{Next},
+\emph{Next}, accept the license and click \emph{Finish}.
+When prompted, approve the installation of unsigned plugins,
+and finally restart eclipse, when asked.
+
+
+\subsection{GNU ARM C/C++ development support}
+
+Again, select in the menu Help $\rightarrow$ Install new Software... as shown in
+Figure \ref{fig:eclipse-update}.
+
+In the install window, paste in the \emph{Work with} field
+the following URL:
+\url{http://gnuarmeclipse.sourceforge.net/updates} and press Enter.
+The list in the middle of the window should have an item, as shown on
+Figure \ref{fig:eclipse-gnu-arm}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/eclipse-gnu-arm.png}
+        \caption{Selecting GNU ARM C/C++ development for Eclipse}
+        \label{fig:eclipse-gnu-arm}
+    \end{figure}
+
+Check the \emph{GNU ARM C/C++ Development Plugin} and click \emph{Next},
+\emph{Next}, select that you accept the license and click \emph{Finish}.
+
+Finally approve the installation of unsigned software, 
+and restart Eclipse when it's asking.
+
+\subsection{Zylin Embedded CDT}
+
+In eclipse, select again in the menu Help $\rightarrow$ Install new Software...
+
+In the \emph{Work with} field, enter the following URL:
+\url{http://www.zylin.com/zylincdt}.
+
+Select the \emph{Zylin Embedded CDT} plugin for installation, 
+as depicted on Figure \ref{fig:eclipse-zylin}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/eclipse-zylin.png}
+        \caption{Selecting Zylin Embedded CDT plugin for Eclipse}
+        \label{fig:eclipse-zylin}
+    \end{figure}
+
+Proceed with the installation as for GNU ARM C/C++ development support plugin.
+
+
+\section{Testing the setup}
+
+Now everything should be installed for software development. 
+This section will help testing if the installed programs really work.
+
+\subsection{Creating a new project and importing the source code}
+
+In Eclipse, select \emph{File} $\rightarrow$ \emph{New} $\rightarrow$ \emph{Project...}.
+In the project type, select \emph{Project from SVN}, as shown on 
+Figure \ref{fig:test-prj-svn}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/test-prj-svn.png}
+        \caption{Creating a new project, from SVN}
+        \label{fig:test-prj-svn}
+    \end{figure}
+
+Click \emph{Next}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/test-import-svn.png}
+        \caption{Importing a new project from SVN}
+        \label{fig:test-import-svn}
+    \end{figure}
+
+In the URL field, enter
+\verb+http://xpack.ijs.si/svn/vsnhellworld/+.
+Also enter your user name and password.
+If you are planning to use SVN extensively, it might be convenient to have your
+password saved by Eclipse.
+See Figure \ref{fig:test-import-svn}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/test-prj-head.png}
+        \caption{Selecting a revision from SVN}
+        \label{fig:test-prj-head}
+    \end{figure}
+
+Click \emph{Next}, and you should get the dialog shown on 
+Figure \ref{fig:test-prj-head}.
+Click the control \emph{Head revision}, then \emph{Finish}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/test-checkout-as.png}
+        \caption{Checking out the source as prject}
+        \label{fig:test-checkout-as}
+    \end{figure}
+
+On the next step, shown on Figure \ref{fig:test-checkout-as}, select 
+\emph{Find projects in children of selected resource} and click \emph{Finish}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/test-project-select.png}
+        \caption{Checking out the source as prject}
+        \label{fig:test-project-select}
+    \end{figure}
+
+In the next dialog, depicted on
+Figure \ref{fig:test-project-select},
+click \emph{Finish}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./png-install-guide/test-got-project.png}
+        \caption{Checking out the source as prject}
+        \label{fig:test-got-project}
+    \end{figure}
+
+Now you should get the sample project in Eclipse, see 
+Figure \ref{fig:test-got-project}.
+
+\subsection{Compiling the source}
+
+In Eclipse, open the C/C++ perspective,  by selecting \emph{Window} $\rightarrow$
+\emph{Open perspective} $\rightarrow$ Other..., 
+and clicking \emph{C/C++} and \emph{OK}.
+See Figure \ref{fig:compile-c-perspective}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/compile-c-perspective.png}
+        \caption{Open the C/C++ perspective}
+        \label{fig:compile-c-perspective}
+    \end{figure}
+
+In this perspective, 
+on the right side, there should be a \emph{Make targets} view. (compile-make.png). 
+Select the helloWorld folder, and inside double-click \emph{Build HelloWorld}.
+
+If everything goes well, you should see similar lines in the console, as the text below:
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/compile-result.png}
+        \caption{Console window contents, after a successful compilation}
+        \label{fig:compile-result}
+    \end{figure}
+
+Now the example project has compiled, and it's ready to be loaded on the VSN.
+
+\subsection{Uploading to the device}
+
+First, connect all the necessary cables:
+    \begin{itemize}
+    \item RS232 cable
+    \item JTAG cable
+    \item power supply
+    \end{itemize}
+to the debugger, and plug the debugger into an USB slot on the PC.
+
+First, it's recommended to launch the RS232 monitoring program.
+In order to do this, select from the menu
+Applications $\rightarrow$ Accessories $\rightarrow$ Serial port terminal.
+Inside the program, select from the menu 
+Configuration $\rightarrow$ Port.
+See Figure \ref{fig:gtkterm-config}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./png-install-guide/gtkterm-config.png}
+        \caption{Configuring gtkterm}
+        \label{fig:gtkterm-config}
+    \end{figure}
+
+The usual settings are:
+    
+    \smallskip
+    \begin{tabular}{ l l }
+    Port         & /dev/ttyUSB0 \\
+    Speed        & 115200       \\
+    Parity       & even         \\
+    Bits         & 8            \\
+    Stop bits    & 1            \\
+    Flow control & none         \\
+    \end{tabular}
+    \smallskip
+
+Note that the port might be different if you are using serial ports on the PC
+(in that case, the port could be /dev/ttyS0, /dev/ttyS1, ...)
+or if you have more serial devices attached on USB (/dev/ttyUSB1, /dev/ttyUSB2, ...).
+
+Now, in Eclipse, select
+in the menu 
+Run $\rightarrow$ External Tools $\rightarrow$ Organize Favorites, 
+select \emph{Add}, check both items and click \emph{OK} and \emph{OK}.
+See Figure \ref{fig:compile-external-tools}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/compile-external-tools.png}
+        \caption{Adding external tools}
+        \label{fig:compile-external-tools}
+    \end{figure}
+
+In order to load the program select
+Run $\rightarrow$ External Tools $\rightarrow$ OpenOCD-ARM-USB-OCD Load.
+
+In the console in Eclipse, you should see the messages depicted on 
+Figure \ref{fig:load-successful},
+after about 5 seconds
+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/load-successful.png}
+        \caption{Console window contents, after uploading the code to the device}
+        \label{fig:load-successful}
+    \end{figure}
+    
+After these messages appear, the VSN should start printing hello world messages 
+on the serial terminal, as shown on Figure \ref{fig:hello-world}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/hello-world.png}
+        \caption{Hello world messages on serial terminal}
+        \label{fig:hello-world}
+    \end{figure}
+
+By following these steps, you should be able to compile and load program to the VSN.
+
+\subsection{Testing debugging facilities}
+
+In order to debug in Eclipse, first the debug configurations have to be added.
+In eclipse, select on the toolbar \emph{Debug} $\rightarrow$ \emph{Organize favorites...}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/debug-organize-fav.png}
+        \caption{Organize the debug favorites}
+        \label{fig:debug-org-fav}
+    \end{figure}
+
+
+In the window that appears, click \emph{Add...},
+select both items, and click \emph{OK} and \emph{OK}. Illustrations can be found on 
+Figure \ref{fig:debug-org-fav} and Figure \ref{fig:debug-add-fav}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/debug-add-fav.png}
+        \caption{Adding debug favorites}
+        \label{fig:debug-add-fav}
+    \end{figure}
+
+In order to be able to debug programs running on the VSN, 
+a debug server must be started.
+In this case, the debug server is called OpenOCD.
+Note that while the debug server is running, the VSN cannot be reprogrammed.
+Starting the debug server can be performed by clicking on the 
+\emph{Debug} icon on the toolbar, and selecting
+\emph{OpenOCD-ARM-USB-OCD Debug}.
+See Figure \ref{fig:debug-openocd-start}.
+Launching the debug server is necessary every time a new debug session is started,
+and it must be stopped before reprogramming the VSN.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/debug-openocd-start.png}
+        \caption{Starting OpenOCD debug server}
+        \label{fig:debug-openocd-start}
+    \end{figure}
+
+Next, start the actual program that will be debugged.
+For this, click on the \emph{Debug} icon on the toolbar, and select
+\emph{VSNHelloWorld Debug}
+(Figure \ref{fig:debug-launch})
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/debug-launch.png}
+        \caption{Lauching the program for debugging}
+        \label{fig:debug-launch}
+    \end{figure}
+
+Now it's recommended to switch to the debug perspective,
+for efficient debugging.
+Click the \emph{Debug} icon on the upper right corner of the Eclipse window.
+The debug perspective is depicted on Figure \ref{fig:debug-window}.
+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./png-install-guide/debug-window.png}
+        \caption{Debug perspective}
+        \label{fig:debug-window}
+    \end{figure}
+
+The marked elements on Figure \ref{fig:debug-window} are:
+    \begin{itemize}
+    \item[(a)] Program flow control and the running processes.
+        Note that the list also contains OpenOCD, the debug server, 
+        and the program being debugged, including the stack(s).
+    \item[(b)] Source code view
+    \item[(c)] The line being executed.
+    \item[(d)] The outline of the current source code.
+        In the upper region there are the lists of breakpoints, register values,
+        variables.
+    \item[(e)] Debugging console.
+    \end{itemize}
+
+At the end of debugging, the executed program and also the 
+debug server should be stopped.
+
+\section{Troubleshooting}
+
+This section tries to give fixes to common problems. 
+The list might be incomplete, so feel free to contact the author for including 
+new entries in this section.
+
+\subsection{Error while starting the debugger: ``Remote 'g' packet is too long: ...''}
+
+\label{sect:gdb-problems}
+This problem is caused by incompatible versions of OpenOCD and CodeSourcery debugger.
+See a discussion about this topic at OpenOCD mailing list:
+\url{https://lists.berlios.de/pipermail/openocd-development/2010-December/017349.html}
+
+Below is a table of OpenCCD and CodeSourcery toolchain versions that are known to work:
+
+    \smallskip
+    \begin{tabular}{ l | l }
+    CodeSourcery version & OpenOCD version \\
+    \hline
+    2010q1-188          &   0.4.0-1+nmu1 (Ubuntu 10.10 package) \\
+    % add other versions here, if needed
+    \end{tabular}
+    \smallskip
+
+Table of not working combinations:
+
+    \smallskip
+    \begin{tabular}{ l | l }
+    CodeSourcery version & OpenOCD version \\
+    \hline
+    2010.09-51          &   0.4.0-1+nmu1 (Ubuntu 10.10 package) \\
+    % add other versions here, if needed
+    \end{tabular}
+    \smallskip
+
+Combinations not appearing in any of the tables have not been tested.
+
+\begin{thebibliography}{9}
+\bibitem{mm10}
+   Marko Mihelin, SensorLab VSN open source development environment setup manual for Windows based development,
+   2010
+
+\end{thebibliography}
+
+\end{document}
+
+
