@@ -738,12 +738,17 @@ installation affecting other users or software on your system. However, before
 we can do that, we need to install some prerequisite software through the
 system's package manager.
 
-Perform the following command as root:
+Perform the following command as root and confirm installation of packages
+when prompted:
 
 \begin{verbatim}
-# aptitude install flex bison libgmp3-dev libmpfr-dev \
-libncurses5-dev libmpc-dev autoconf texinfo build-essential \
+# aptitude install libgmp3-dev \
+libncurses5-dev \
+libmpc-dev \
+autoconf \
+build-essential \
 git-core
+# aptitude build-dep gcc-4.4
 \end{verbatim}
 
 \subsection{Installing on-chip debugger}
@@ -765,7 +770,8 @@ $ dpkg-source -x openocd_0.5.0-1.dsc
 
 Now build the package. \verb|dpkg-buildpackage| might display a message about
 missing build dependencies. In that case, install the missing packages that are
-listed in the error message using \verb|aptitude install|.
+listed in the error message using \verb|aptitude install| and re-run
+\verb|dpkg-buildpackage|.
 
 \begin{verbatim}
 $ cd openocd-0.5.0
@@ -773,9 +779,7 @@ $ dpkg-buildpackage -uc -us
 $ cd ..
 \end{verbatim}
 
-
-
-And install it as root
+Install the compiled package as root:
 
 \begin{verbatim}
 # dpkg -i openocd_0.5.0-1_amd64.deb
