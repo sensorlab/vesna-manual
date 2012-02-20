@@ -38,10 +38,10 @@
 
     \textbf{ \Large
     version 0.02}\\[1cm]
-
+    
     \textnormal{\Large
-    by Zoltan Padrah}\\[1cm]
-
+    by Zoltan Padrah, Tomaž Šolc}\\[1cm]
+    
     \vfill
 
     \textnormal{\large
@@ -53,41 +53,43 @@
 
 \section{Introduction}
 
-This document describes the installation of the development tools for
-Versatile Sensor Node (VSN) on a GNU/Linux operating system.
-The exact steps are performed on Ubuntu 10.10, 32 bit distribution,
-but the document should be applicable to any distribution.
-Besides distribution-specific instructions,
-generic steps will be also described.
+This document describes the installation of a cross-compiler and associated
+development tools required to compile and debug software for VESNA wireless
+sensor node on a GNU/Linux operating system.
 
-The installation consists of the following steps:
-	\begin{enumerate}
-	\item Preparing the system and installing custom software
-		\begin{enumerate}
-		\item Setting up \verb+bash+ as the default shell in the system
-		\item Installing the Codesourcery Lite toolchain
-		\item Inserting the directory of the Codesourcery toolchain in the \verb+PATH+
-		\end{enumerate}
-	\item Installing programs provided as packages by the distribution
-		\begin{enumerate}
-		\item Eclipse
-		\item openOCD
-		\item moserial
-		\end{enumerate}
-	\item Installing Eclipse plugins for
-		\begin{enumerate}
-		\item Subversive SVN support
-		\item GNU ARM C/C++ development support
-		\item Zylin Embedded CDT
-		\end{enumerate}
-	\item Testing the setup
-		\begin{enumerate}
-		\item Creating a new project and importing the source code
-		\item Compiling the source
-		\item Uploading to the device
-		\item Testing debugging facilities
-		\end{enumerate}
-	\end{enumerate}
+It offers two distinct approaches to development: one that focuses on graphical
+interaction and an integrated development environment (IDE) and one focused on
+command-line interfaces and scripting. A short overview of both is given below
+- they are identical in regard to functionality and it is up to the reader to
+choose the approach that he or she finds most convenient.
+
+The graphical approach is recommended for new developers and those moving from a
+Windows development environment. Developers with a background in free open
+source software development will likely prefer the command-line way.
+
+The exact steps are performed on a specific distribution mentioned, but the
+document should be applicable to any distribution. Besides distribution-specific
+instructions, generic steps will be also described.
+
+\subsection{Graphical way}
+
+\begin{enumerate}
+\item Eclipse IDE with Subversive SVN support, Zylin Embedded CDT
+\item Cross-compiler provided by Codesourcery Lite binary toolchain
+distribution
+\item openOCD on-chip debugger
+\item moserial serial terminal
+\item Steps performed on Ubuntu 10.10, 32 bit distribution
+\end{enumerate}
+
+\subsection{Command-line way}
+
+\begin{enumerate}
+\item Text editor and terminal emulator of choice, GNU make, GNU debugger
+\item Cross-compiler compiled from official GNU sources
+\item openOCD on-chip debugger
+\item Steps performed on Debian 6.0 (Squeeze), amd64 architecture
+\end{enumerate}
 
 \newpage
 
@@ -97,7 +99,7 @@ The installation consists of the following steps:
 \listoffigures
 \newpage
 
-\section*{List of Abbreviations}
+\subsection*{List of Abbreviations}
 	\begin{tabular}{ l l }
     CDT	    & C/C++ Development Tooling \\
     SVN     & Apache Subversion \\
@@ -106,11 +108,13 @@ The installation consists of the following steps:
 \newpage
 
 
-\section{Preparing the system and installing custom software}
+\section{Graphical way}
+
+\subsection{Preparing the system and installing custom software}
 
 % This section includes special steps, that
 
-\subsection{Setting up bash as the default shell in the system}
+\subsubsection{Setting up bash as the default shell in the system}
 
 In order to be able to run in Eclipse external programs from special locations
 (in our case, the compiler and other needed tools),
@@ -147,7 +151,7 @@ Otherwise you will get errors when you are trying to compile the source code.
 It is recommended to log out and log in after
 competing section \ref{sect:change-path}, in order to avoid one extra logout and login.
 
-\subsection{Installing the Codesourcery Lite toolchain}
+\subsubsection{Installing the Codesourcery Lite toolchain}
 
 The Codesourcery Lite toolchain contains
 the compiler, linker, debugger, and other utilities needed for
@@ -173,7 +177,7 @@ In this case, the folder is called arm-2010q1.
 The next step is to make the system know about the location of the tools;
 this is achieved by setting up the PATH for the current user.
 
-\subsection{Inserting the directory of the Codesourcery toolchain in the PATH}
+\subsubsection{Inserting the directory of the Codesourcery toolchain in the PATH}
 
     \label{sect:change-path}
 The \verb+PATH+ variable stores a list of directories, where various
@@ -223,7 +227,7 @@ Save the file and close the text editor.
 After competing these operations, and before launching Eclipse, it is needed to
 log out and log in back, in order to apply the performed changes.
 
-\section{Installing programs provided as packages by the distribution}
+\subsection{Installing programs provided as packages by the distribution}
 
 Programs provided by Linux distributions can be installed by using the package management system.
 On Ubuntu, the Synaptic package manager is recommended.
@@ -232,7 +236,7 @@ Other distributions have equivalent tools for package management.
 Open Synaptic by selecting in the menu System $\rightarrow$ Administration $\rightarrow$
 Synaptic Package Manager.
 
-\subsection{Eclipse}
+\subsubsection{Eclipse}
 
 In Synaptic select Edit $\rightarrow$ Search, or Ctrl+F, and enter \verb+eclipse+
 in the search box. Right click the package called
@@ -256,7 +260,7 @@ see Figure \ref{fig:synaptic-eclipse-extra-packages.png}. Click \emph{Mark}.
         \label{fig:synaptic-eclipse-extra-packages.png}
     \end{figure}
 
-\subsection{openOCD}
+\subsubsection{openOCD}
 
 Still in Synaptic, search for package called \verb+openocd+,
 and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
@@ -284,7 +288,7 @@ and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
 %        \label{fig:synaptic-gtkterm}
 %    \end{figure}
 
-\subsection{Moserial}
+\subsubsection{Moserial}
 
 Optionally, install a program for communicating on the RS232 port,
 connected to the VSN.
@@ -303,7 +307,7 @@ See Figure \ref{fig:synaptic-moserial}.
 
 The next step is to actually perform the installation of the above mentioned programs.
 
-\subsection{Performing the actual installation}
+\subsubsection{Performing the actual installation}
 
 Finally, click \emph{Apply} in Synaptic.
 A window as the one shown on Figure \ref{fig:synaptic-apply-changes.png}
@@ -318,7 +322,7 @@ should appear.
 
 Click \emph{Apply}, wait for the installation to finish, and close Synaptic.
 
-\section{Installing Eclipse plugins}
+\subsection{Installing Eclipse plugins}
 
 First, start Eclipse, by selecting in the menu Applications $\rightarrow$
 Programming $\rightarrow$ Eclipse.
@@ -352,7 +356,7 @@ Figure \ref{fig:eclipse-update}.
 % http://download.eclipse.org/tools/cdt/releases/galileo/
 % https://sites.google.com/site/stm32discovery/open-source-development-with-the-stm32-discovery/getting-hardware-debuging-working-with-eclipse-and-code-sourcey
 
-\subsection{Subversive SVN suport}
+\subsubsection{Subversive SVN suport}
 
 
 In the \emph{Work with} field, insert the main eclipse update site;
@@ -393,7 +397,7 @@ When prompted, approve the installation of unsigned plugins,
 and finally restart eclipse, when asked.
 
 
-\subsection{GNU ARM C/C++ development support}
+\subsubsection{GNU ARM C/C++ development support}
 
 Again, select in the menu Help $\rightarrow$ Install new Software... as shown in
 Figure \ref{fig:eclipse-update}.
@@ -417,7 +421,7 @@ Check the \emph{GNU ARM C/C++ Development Plugin} and click \emph{Next},
 Finally approve the installation of unsigned software,
 and restart Eclipse when it's asking.
 
-\subsection{Zylin Embedded CDT}
+\subsubsection{Zylin Embedded CDT}
 
 In eclipse, select again in the menu Help $\rightarrow$ Install new Software...
 
@@ -437,12 +441,12 @@ as depicted on Figure \ref{fig:eclipse-zylin}.
 Proceed with the installation as for GNU ARM C/C++ development support plugin.
 
 
-\section{Testing the setup}
+\subsection{Testing the setup}
 
 Now everything should be installed for software development.
 This section will help testing if the installed programs really work.
 
-\subsection{Creating a new project and importing the source code}
+\subsubsection{Creating a new project and importing the source code}
 
 In Eclipse, select \emph{File} $\rightarrow$ \emph{New} $\rightarrow$ \emph{Project...}.
 In the project type, select \emph{Project from SVN}, as shown on
@@ -513,7 +517,7 @@ click \emph{Finish}.
 Now you should get the sample project in Eclipse, see
 Figure \ref{fig:test-got-project}.
 
-\subsection{Compiling the source}
+\subsubsection{Compiling the source}
 
 In Eclipse, open the C/C++ perspective,  by selecting \emph{Window} $\rightarrow$
 \emph{Open perspective} $\rightarrow$ Other...,
@@ -542,7 +546,7 @@ If everything goes well, you should see similar lines in the console, as the tex
 
 Now the example project has compiled, and it's ready to be loaded on the VSN.
 
-\subsection{Uploading to the device}
+\subsubsection{Uploading to the device}
 
 First, connect all the necessary cables to the debugger:
     \begin{itemize}
@@ -642,7 +646,7 @@ on the serial terminal, as shown on Figure \ref{fig:hello-world}.
 
 By following these steps, you should be able to compile and load program to the VSN.
 
-\subsection{Testing debugging facilities}
+\subsubsection{Testing debugging facilities}
 
 In order to debug in Eclipse, first the debug configurations have to be added.
 In eclipse, select on the toolbar \emph{Debug} $\rightarrow$ \emph{Organize favorites...}.
@@ -725,13 +729,13 @@ The marked elements on Figure \ref{fig:debug-window} are:
 At the end of debugging, the executed program and also the
 debug server should be stopped.
 
-\section{Troubleshooting}
+\subsection{Troubleshooting}
 
 This section tries to give fixes to common problems.
 The list might be incomplete, so feel free to contact the author for including
 new entries in this section.
 
-\subsection{Error while starting the debugger: ``Remote 'g' packet is too long: ...''}
+\subsubsection{Error while starting the debugger: ``Remote 'g' packet is too long: ...''}
 
 \label{sect:gdb-problems}
 This problem is caused by incompatible versions of OpenOCD and CodeSourcery debugger.
@@ -762,7 +766,7 @@ Table of not working combinations:
 
 Combinations not appearing in any of the tables have not been tested.
 
-\subsection{OpenOCD prints error about stm32.flash
+\subsubsection{OpenOCD prints error about stm32.flash
     when attempting to upload program,
     on Ubuntu 10.04 LTS}
 
@@ -774,6 +778,241 @@ After installing OpenOCD, remove the extra repositories,
 because installing software from different version of the same distribution
 might cause problems.
 
+
+\newpage
+
+\section{Command-line way}
+
+The following instructions assume you are working in a terminal emulator,
+either a text-mode virtual console or a graphical emulator. If you are using the
+default GNOME environment, you can open one from the Applications, Accessories,
+Terminal menu entry.
+
+Command lines starting with dollar sign (\verb|$|) are to be executed under your
+normal user privileges. Lines starting with a hash sign (\verb|#|) should be
+executed as root using \verb|su| or \verb|sudo|, depending on your system
+configuration.
+
+A backslash (\verb|\|) at the end of the line means the command continues on the
+next line without a carriage return.
+
+\subsection{Installing dependencies}
+
+All of the software that we will compile from source will be installed into
+your home directory. This approach was chosen so that the time required to
+work with elevated privileges is minimal and hence minize the chances of the
+installation affecting other users or software on your system. However, before
+we can do that, we need to install some prerequisite software through the
+system's package manager.
+
+Perform the following command as root and confirm installation of packages
+when prompted:
+
+\begin{verbatim}
+# aptitude install libgmp3-dev \
+libncurses5-dev \
+libmpc-dev \
+autoconf \
+build-essential \
+git-core
+# aptitude build-dep gcc-4.4
+\end{verbatim}
+
+\subsection{Installing on-chip debugger}
+
+At the time of writing, the \verb|openocd| version in the Debian stable
+distribution (0.3.1) is too old to support VESNA. We require at least version 0.5.0, so
+we will compile and install the package from source.
+
+Begin by downloading and unpacking the Debian source package (if the URLs below
+no longer work, you can find a suitable version at
+\url{http://packages.debian.org/wheezy/openocd}).
+
+\begin{verbatim}
+$ wget http://ftp.de.debian.org/debian/pool/main/o/openocd/openocd_0.5.0-1.dsc \
+http://ftp.de.debian.org/debian/pool/main/o/openocd/openocd_0.5.0.orig.tar.bz2 \
+http://ftp.de.debian.org/debian/pool/main/o/openocd/openocd_0.5.0-1.debian.tar.gz
+$ dpkg-source -x openocd_0.5.0-1.dsc
+\end{verbatim}
+
+Now build the package. \verb|dpkg-buildpackage| might display a message about
+missing build dependencies. In that case, install the missing packages that are
+listed in the error message using \verb|aptitude install| and re-run
+\verb|dpkg-buildpackage|.
+
+\begin{verbatim}
+$ cd openocd-0.5.0
+$ dpkg-buildpackage -uc -us
+$ cd ..
+\end{verbatim}
+
+Install the compiled package as root:
+
+\begin{verbatim}
+# dpkg -i openocd_0.5.0-1_amd64.deb
+\end{verbatim}
+
+Check the setup by running \verb|openocd -v|. It should return the following:
+
+\begin{verbatim}
+Open On-Chip Debugger 0.5.0 (2011-08-09-08:45)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.berlios.de/doc/doxygen/bugs.html
+\end{verbatim}
+
+\subsection{Installing cross-compiler toolchain}
+
+We will use a customized version of the \verb|summon-arm-toolchain| script to
+build a GNU toolchain targeting ARM Cortex M3 architecture.
+
+First we need to download the latest version of the script:
+
+\begin{verbatim}
+$ git clone https://github.com/avian2/summon-arm-toolchain.git
+\end{verbatim}
+
+Now run the script. This will download, compile and install the toolchain
+(binutils, gcc, gdb and newlib C library) into \verb|~/local|. If you
+would like to use a different directory, modify the value of the PREFIX variable
+at the top of the \verb|summon-arm-toolchain| script.
+
+\begin{verbatim}
+$ cd summon-arm-toolchain
+$ ./summon-arm-toolchain
+\end{verbatim}
+
+You should now add \verb|~/local/bin| (or the directory you installed the toolchain
+in) to your PATH. This is best done by editing \verb|~/.bashrc| and adding a
+line like the following at the top:
+
+\begin{verbatim}
+export PATH="$HOME/local/bin:$PATH"
+\end{verbatim}
+
+Remember that this setting will take effect only after you open a new terminal window or
+a new login.
+
+To test the setup, try running \verb|arm-none-eabi-gcc --version|. It should have the
+following effect:
+
+\begin{verbatim}
+$ arm-none-eabi-gcc --version
+arm-none-eabi-gcc (GCC) 4.6.1
+Copyright (C) 2011 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+\end{verbatim}
+
+\subsection{Compiling libopencm3}
+
+Libopencm3 is a standard peripherals support library for ARM Cortex M3
+microcontrollers. The version used below contains patches for VESNA that have
+not yet been accepted up-stream.
+
+\begin{verbatim}
+$ git clone https://github.com/avian2/libopencm3.git
+\end{verbatim}
+
+Now compile and install the library. Adjust the DESTDIR value to the same prefix
+you used when installing the toolchain.
+
+\begin{verbatim}
+$ cd libopencm3
+$ make
+$ DESTDIR=~/local make install
+\end{verbatim}
+
+\subsection{Testing the setup}
+
+To test the setup we will compile, upload and debug a short program that blinks
+the yellow LED present on the VESNA core board and sends a message to debugger's
+serial port.
+
+First, download the source of the program:
+
+\begin{verbatim}
+$ git clone https://github.com/avian2/vesna-hellow-world.git
+\end{verbatim}
+
+Then compile it:
+
+\begin{verbatim}
+$ cd vesna-hello-world
+$ make
+\end{verbatim}
+
+And load it into microcontroller's flash. For this to work, you need to have an
+Olimex ARM-USB-OCD programmer connected to VESNA through the SND debug board.
+Make sure the power and JTAG connectors are securely attached.
+
+\begin{verbatim}
+$ make hello-world.u
+\end{verbatim}
+
+The yellow LED on the VESNA board should start blinking after programming is complete.
+To see messages sent to the serial port, you need to attach the serial
+connector on the Olimex ARM-USB-OCD to the VESNA's serial port. 
+
+You then need to read the correct device file. If you don't have any
+other USB-to-serial adapters connected to the machine, this will usually be
+\verb|/dev/ttyUSB0|. The program sets the baud rate to 19200 bps, and we have to
+match that setting on the Linux side.
+
+\begin{verbatim}
+$ stty -F /dev/ttyUSB0 19200
+$ cat /dev/ttyUSB0
+\end{verbatim}
+
+You should now see a stream of \verb|Hello, world!| messages appear in the
+terminal. Of course, you can also use your serial terminal emulator of choice 
+
+\subsection{Debugging setup}
+
+OpenOCD allows you to attach a GNU debugger instance to VESNA. This allows you
+to conveniently debug the code running on the microcontroller, for instance by
+manually inspecting memory contents or single stepping through code.
+
+We begin by starting OpenOCD in server mode.
+
+\begin{verbatim}
+$ openocd -f interface/olimex-arm-usb-ocd.cfg -f target/stm32f1x.cfg
+\end{verbatim}
+
+Then we can start GNU debugger and attach it to OpenOCD.
+
+\begin{verbatim}
+$ arm-none-eabi-gdb
+(gdb) target remote localhost:3333
+\end{verbatim}
+
+At this point we can start debugging the code that is already running on the
+microcontroller using the usual GDB commands. To reset the microcontroller, use:
+
+\begin{verbatim}
+(gdb) monitor reset halt
+(gdb) continue
+\end{verbatim}
+
+You can also program the microcontroller's flash directly from the debugger. For
+instance, to load the hello-world program, do:
+
+\begin{verbatim}
+(gdb) monitor reset halt
+(gdb) file hello-world.elf
+(gdb) load
+(gdb) monitor reset halt
+\end{verbatim}
+
+Note that to see the source of the libopencm3 functions correctly, you might
+need to adjust the source search path. Adjust the path in the command below to
+point to the location where you compiled libopencm3.
+
+\begin{verbatim}
+(gdb) directory ~/libopencm3/lib/stm32/f1
+\end{verbatim}
+
+\newpage
 
 \begin{thebibliography}{9}
 \bibitem{mm10}
