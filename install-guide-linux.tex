@@ -10,7 +10,7 @@
 
 \usepackage{hyperref}
 
-\title{SensorLab VSN open source development environment setup manual for Linux based development}
+\title{SensorLab VESNA open source development environment setup manual for Linux based development}
 \author{Zoltan Padrah}
 
 \begin{document}
@@ -32,7 +32,7 @@
 
     \vfill
 
-    \textbf{\huge SensorLab VSN open source development environment setup manual
+    \textbf{\huge SensorLab VESNA open source development environment setup manual
         for Linux based development}\\[1.5cm]
 
 
@@ -103,7 +103,6 @@ distribution
 	\begin{tabular}{ l l }
     CDT	    & C/C++ Development Tooling \\
     SVN     & Apache Subversion \\
-    VSN     & Versatile Sensor Node \\
 	\end{tabular}
 \newpage
 
@@ -119,7 +118,7 @@ distribution
 In order to be able to run in Eclipse external programs from special locations
 (in our case, the compiler and other needed tools),
 the default shell for script execution must be changed.
-Otherwise the default system shell (dash) will be launched by eclipse,
+Otherwise the default system shell (dash) will be launched by Eclipse,
 and the compiler won't be found.
 
 This can be achieved by launching Applications $\rightarrow$ Accessories $\rightarrow$ Terminal,
@@ -291,7 +290,7 @@ and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
 \subsubsection{Moserial}
 
 Optionally, install a program for communicating on the RS232 port,
-connected to the VSN.
+connected to VESNA.
 Moserial is one viable option.
 Search for \verb+moserial+ on Synaptic, and select it for installation.
 See Figure \ref{fig:synaptic-moserial}.
@@ -544,7 +543,7 @@ If everything goes well, you should see similar lines in the console, as the tex
         \label{fig:compile-result}
     \end{figure}
 
-Now the example project has compiled, and it's ready to be loaded on the VSN.
+Now the example project has compiled, and it's ready to be loaded on VESNA.
 
 \subsubsection{Uploading to the device}
 
@@ -627,7 +626,7 @@ after about 5 seconds
         \label{fig:load-successful}
     \end{figure}
 
-After these messages appear, the VSN should start printing hello world messages
+After these messages appear, VESNA should start printing hello world messages
 on the serial terminal, as shown on Figure \ref{fig:hello-world}.
 
     \begin{figure}[H]
@@ -644,7 +643,7 @@ on the serial terminal, as shown on Figure \ref{fig:hello-world}.
 %        \label{fig:hello-world}
 %    \end{figure}
 
-By following these steps, you should be able to compile and load program to the VSN.
+By following these steps, you should be able to compile and load program to VESNA.
 
 \subsubsection{Testing debugging facilities}
 
@@ -670,16 +669,16 @@ Figure \ref{fig:debug-org-fav} and Figure \ref{fig:debug-add-fav}.
         \label{fig:debug-add-fav}
     \end{figure}
 
-In order to be able to debug programs running on the VSN,
+In order to be able to debug programs running on VESNA,
 a debug server must be started.
 In this case, the debug server is called OpenOCD.
-Note that while the debug server is running, the VSN cannot be reprogrammed.
+Note that while the debug server is running, VESNA cannot be reprogrammed.
 Starting the debug server can be performed by clicking on the
 \emph{Debug} icon on the toolbar, and selecting
 \emph{OpenOCD-ARM-USB-OCD Debug}.
 See Figure \ref{fig:debug-openocd-start}.
 Launching the debug server is necessary every time a new debug session is started,
-and it must be stopped before reprogramming the VSN.
+and it must be stopped before reprogramming the VESNA.
 
     \begin{figure}[H]
     \centering
