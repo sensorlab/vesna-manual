@@ -873,12 +873,12 @@ $ git clone https://github.com/avian2/summon-arm-toolchain.git
 
 Now run the script. This will download, compile and install the toolchain
 (binutils, gcc, gdb and newlib C library) into \verb|~/local|. If you
-would like to use a different directory, modify the value of the PREFIX variable
-at the top of the \verb|summon-arm-toolchain| script.
+would like to use a different directory, pass a different path to the
+\verb|-t| command-line argument.
 
 \begin{verbatim}
 $ cd summon-arm-toolchain
-$ ./summon-arm-toolchain
+$ ./summon-arm-toolchain -t ~/local
 \end{verbatim}
 
 You should now add \verb|~/local/bin| (or the directory you installed the toolchain
