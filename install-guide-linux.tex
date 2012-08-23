@@ -440,12 +440,13 @@ have a github account and at least one SSH key pair set up for github.
     \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-copied.png}
-        \caption{SSH keys at \~/.ssh}
+        \caption{SSH keys at $ \sim/.ssh $ }
         \label{fig:auth-copied}
     \end{figure}
 
 In case you have the SSH key pair set up, then you can copy the key to
-the \verb+~/.ssh/+ folder, and you are done.
+the \verb+~/.ssh/+ folder,
+add the keys to EGit's list of keys and you are done.
 Note that you need to set up the correct permissions on the key files:
 the files must be owned by your user, and they can be readable only to
 your user.
@@ -461,8 +462,23 @@ and search for \emph{SSH2}, then select
     \begin{figure}[H]
     \centering
         \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-generate.png}
-        \caption{Generating SSH keys with eclipse}
+        \caption{Generating SSH keys with Eclipse}
         \label{fig:auth-generate}
+    \end{figure}
+
+For adding private SSH keys to Eclipse, go to
+\emph{Window} $\rightarrow$ \emph{Preferences...}
+and search for \emph{SSH2}, then select
+\emph{Genera} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{SSH2} $\rightarrow$ \emph{General}.
+There click \emph{Add private key...} and select the private key that you
+will use with Github.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-add-key.png}
+        \caption{Adding private keys to Eclipse}
+        \label{fig:auth-add-key}
     \end{figure}
 
 \subsection{Testing the setup}
