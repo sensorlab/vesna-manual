@@ -488,6 +488,10 @@ Now everything should be installed for software development.
 This section guides through the testing of the installed programs
 and gives a short introductions to their functioning.
 
+Note that after installing the compiler tools, you will need to log out
+and log in before launching Eclipse. Otherwise you might get errors
+saying that the executable \verb+arm-none-eabi-gcc+ cannot be found.
+
 \subsubsection{Creating a new project and importing the source code}
 
 In Eclipse, select \emph{File} $\rightarrow$ \emph{Import...}.
@@ -616,9 +620,31 @@ See Figure \ref{fig:compile-c-perspective}.
     \end{figure}
 
 In this perspective,
-on the right side, there should be a \emph{Make targets} view. (compile-make.png).
-Select the helloWorld folder, and inside double-click \emph{Build HelloWorld}.
+on the right side, there should be a \emph{Make targets} view.
 
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/compile-make.png}
+        \caption{Make targets view}
+        \label{fig:compile-make}
+    \end{figure}
+
+Select the \emph{VESNADriversDemo} folder in the Make targets view,
+and right-click on it and select \emph{New} in the menu.
+Set the make target name to \verb+all+.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/compile-add-target.png}
+        \caption{Adding a make target}
+        \label{fig:compile-add-target}
+    \end{figure}
+
+Other useful targets are \verb+clean+ for cleaning the source code from the
+build output and \verb+drivers_demo.load5+ for loading the application
+to VESNA.
+
+Click \emph{OK}, then double-click the newly created make target.
 If everything goes well, you should see similar lines in the console, as the text below:
 
     \begin{figure}[H]
@@ -631,6 +657,7 @@ If everything goes well, you should see similar lines in the console, as the tex
 Now the example project has compiled, and it's ready to be loaded on VESNA.
 
 \subsubsection{Uploading to the device}
+
 
 First, connect all the necessary cables to the debugger:
     \begin{itemize}
@@ -656,12 +683,6 @@ See Figure \ref{fig:moserial-config}.
         \label{fig:moserial-config}
     \end{figure}
 
-%    \begin{figure}[H]
-%    \centering
-%        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/gtkterm-config.png}
-%        \caption{Configuring gtkterm}
-%        \label{fig:gtkterm-config}
-%    \end{figure}
 
 The usual settings are:
 
@@ -695,6 +716,8 @@ See Figure \ref{fig:compile-external-tools}.
         \caption{Adding external tools}
         \label{fig:compile-external-tools}
     \end{figure}
+
+%%
 
 In order to load the program select
 Run $\rightarrow$ External Tools $\rightarrow$ OpenOCD-ARM-USB-OCD Load.
