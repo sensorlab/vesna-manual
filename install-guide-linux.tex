@@ -483,32 +483,49 @@ will use with Github.
 
 \subsection{Testing the setup}
 
-% until here the guide is OK
 
 Now everything should be installed for software development.
-This section will help testing if the installed programs really work.
+This section guides through the testing of the installed programs
+and gives a short introductions to their functioning.
 
 \subsubsection{Creating a new project and importing the source code}
 
-%In Eclipse, select \emph{File} $\rightarrow$ \emph{New} $\rightarrow$ \emph{Project...}.
-%In the project type, select \emph{Project from SVN}, as shown on
-%Figure \ref{fig:test-prj-svn}.
+In Eclipse, select \emph{File} $\rightarrow$ \emph{Import...}.
+For the import source select \emph{Projects from Git}, as shown on
+Figure \ref{fig:test-prj-git}.
 
-%    \begin{figure}[H]
-%    \centering
-%        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/test-prj-svn.png}
-%        \caption{Creating a new project, from SVN}
-%        \label{fig:test-prj-svn}
-%    \end{figure}
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/test-prj-git.png}
+        \caption{Import from Git}
+        \label{fig:test-prj-git}
+    \end{figure}
 
-%Click \emph{Next}.
+Click \emph{Next}.
 
-%    \begin{figure}[H]
-%    \centering
-%        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-import-svn.png}
-%        \caption{Importing a new project from SVN}
-%        \label{fig:test-import-svn}
-%    \end{figure}
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-git-repo.png}
+        \caption{Select the Git repository}
+        \label{fig:test-select-git-repo}
+    \end{figure}
+
+Because the source code is not available in a local git repository, first
+download the source code by cloning the
+\verb+vesna-drivers+ repository.
+
+
+Click \emph{Clone...} and fill in the URI field with
+\verb+git@github.com:sensorlab/vesna-drivers.git+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-cloning-settings.png}
+        \caption{Parameters of the repository to clone}
+        \label{fig:test-cloning-settings}
+    \end{figure}
+
+Click \emph{Next}.
 
 %In the URL field, enter
 %\verb+http://xpack.ijs.si/svn/vsnhellworld/+.
