@@ -103,6 +103,7 @@ instructions, generic steps will be also described.
 	\begin{tabular}{ l l }
     CDT	    & C/C++ Development Tooling \\
 %    SVN     & Apache Subversion \\
+	SSH		& Secure Shell \\
 	\end{tabular}
 \newpage
 
@@ -431,6 +432,38 @@ as depicted on Figure \ref{fig:eclipse-zylin}.
 
 Proceed with the installation as for GNU ARM C/C++ development support plugin.
 
+\subsection{Setting up authentication for Github}
+
+In order to download the source code from github, one needs to
+have a github account and at least one SSH key pair set up for github.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-copied.png}
+        \caption{SSH keys at \~/.ssh}
+        \label{fig:auth-copied}
+    \end{figure}
+
+In case you have the SSH key pair set up, then you can copy the key to
+the \verb+~/.ssh/+ folder, and you are done.
+Note that you need to set up the correct permissions on the key files:
+the files must be owned by your user, and they can be readable only to
+your user.
+
+If you need to create account and generate keys, then you can use the
+tool available in Eclipse, and proceed with account creation on github.
+The key generator tool can be found at
+\emph{Window} $\rightarrow$ \emph{Preferences...}
+and search for \emph{SSH2}, then select
+\emph{Genera} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{SSH2} $\rightarrow$ \emph{Key Management}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-generate.png}
+        \caption{Generating SSH keys with eclipse}
+        \label{fig:auth-generate}
+    \end{figure}
 
 \subsection{Testing the setup}
 
