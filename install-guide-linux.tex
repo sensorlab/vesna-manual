@@ -37,11 +37,11 @@
 
 
     \textbf{ \Large
-    version 0.04}\\[1cm]
-    
+    version 0.10}\\[1cm]
+
     \textnormal{\Large
     by Zoltan Padrah, Tomaž Šolc}\\[1cm]
-    
+
     \vfill
 
     \textnormal{\large
@@ -74,11 +74,11 @@ instructions, generic steps will be also described.
 \subsection{Graphical way}
 
 \begin{enumerate}
-\item Eclipse IDE with Subversive SVN support, Zylin Embedded CDT
-\item Cross-compiler provided by Codesourcery Lite binary toolchain
-distribution
-\item openOCD on-chip debugger
-\item moserial serial terminal
+\item Eclipse IDE with EGit, Zylin Embedded CDT
+\item Cross-compiler provided by CodeSourcery Lite binary toolchain
+	distribution
+\item OpenOCD on-chip debugger
+\item moserial or CuteCom serial terminal
 \item Steps performed on Ubuntu 10.10, 32 bit distribution
 \end{enumerate}
 
@@ -87,7 +87,7 @@ distribution
 \begin{enumerate}
 \item Text editor and terminal emulator of choice, GNU make, GNU debugger
 \item Cross-compiler compiled from official GNU sources
-\item openOCD on-chip debugger
+\item OpenOCD on-chip debugger
 \item Steps performed on Debian 6.0 (Squeeze), amd64 architecture
 \end{enumerate}
 
@@ -102,7 +102,8 @@ distribution
 \subsection*{List of Abbreviations}
 	\begin{tabular}{ l l }
     CDT	    & C/C++ Development Tooling \\
-    SVN     & Apache Subversion \\
+%    SVN     & Apache Subversion \\
+	SSH		& Secure Shell \\
 	\end{tabular}
 \newpage
 
@@ -145,14 +146,14 @@ Select \emph{No}, and press enter.
 
 Finally close the terminal window.
 In order to apply these changes, you must either log out and log in,
-or launch eclipse from a terminal.
+or launch Eclipse from a terminal.
 Otherwise you will get errors when you are trying to compile the source code.
 It is recommended to log out and log in after
 competing section \ref{sect:change-path}, in order to avoid one extra logout and login.
 
-\subsubsection{Installing the Codesourcery Lite toolchain}
+\subsubsection{Installing the CodeSourcery Lite toolchain}
 
-The Codesourcery Lite toolchain contains
+The CodeSourcery Lite toolchain contains
 the compiler, linker, debugger, and other utilities needed for
 ARM development.
 
@@ -165,7 +166,7 @@ As of date of writing, the latest version is 2010.09-51, but
 due to compatibility problems during debugging, the recommended version is \emph{2010q1-188}.
 For details, see section \ref{sect:gdb-problems} in Troubleshooting part.
 The direct link to the recommended version is
-\url{http://www.codesourcery.com/sgpp/lite/arm/portal/release1294}.
+\url{https://sourcery.mentor.com/GNUToolchain/package6493/public/arm-none-eabi/arm-2010q1-188-arm-none-eabi-i686-pc-linux-gnu.tar.bz2}.
 
 On the webpage, select \emph{IA32 GNU/Linux TAR},
 and save the received file.
@@ -176,13 +177,13 @@ In this case, the folder is called arm-2010q1.
 The next step is to make the system know about the location of the tools;
 this is achieved by setting up the PATH for the current user.
 
-\subsubsection{Inserting the directory of the Codesourcery toolchain in the PATH}
+\subsubsection{Inserting the directory of the CodeSourcery toolchain in the PATH}
 
     \label{sect:change-path}
 The \verb+PATH+ variable stores a list of directories, where various
-program executable can be found. In order to make Eclipse to know about the
+program executables can be found. In order to make Eclipse know about the
 ARM development tools, the directory containing the tools must be inserted
-in this list.
+into this list.
 
 Select from the menu Applications $\rightarrow$ Accessories $\rightarrow$ Text Editor,
 and click open. Navigate to your home folder, then right click on the file list,
@@ -216,7 +217,6 @@ including the case when compiling programs from Eclipse.
 
     \begin{figure}[H]
     \centering
-            % TODO edit picture
         \includegraphics[width=\textwidth]{./install-guide-linux-images/editing-bashrc.png}
         \caption{Editing .bashrc}
         \label{fig:editing-bashrc}
@@ -231,9 +231,12 @@ log out and log in back, in order to apply the performed changes.
 Programs provided by Linux distributions can be installed by using the package management system.
 On Ubuntu, the Synaptic package manager is recommended.
 Other distributions have equivalent tools for package management.
+If Synaptic is not installed, the you can install it first by using
+Ubuntu Software Center.
 
 Open Synaptic by selecting in the menu System $\rightarrow$ Administration $\rightarrow$
-Synaptic Package Manager.
+Synaptic Package Manager,
+or Dash home, and write Synaptic in the search field.
 
 \subsubsection{Eclipse}
 
@@ -259,7 +262,21 @@ see Figure \ref{fig:synaptic-eclipse-extra-packages.png}. Click \emph{Mark}.
         \label{fig:synaptic-eclipse-extra-packages.png}
     \end{figure}
 
-\subsubsection{openOCD}
+\subsubsection{Eclipse Git plugin (EGit)}
+
+From the search results in synaptic, also select the package
+\verb+eclipse-egit+ for installation, see
+Figure \ref{fig:synapic-eclipse-egit.png}.
+EGit is used in Eclipse for supporting the Git version control system.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/synaptic-eclipse-egit.png}
+        \caption{Selecting eclipse-egit for installation}
+        \label{fig:synapic-eclipse-egit.png}
+    \end{figure}
+
+\subsubsection{OpenOCD}
 
 Still in Synaptic, search for package called \verb+openocd+,
 and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
@@ -272,26 +289,27 @@ and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
         \label{fig:synaptic-openocd}
     \end{figure}
 
-%\subsection{GtkTerm}
 
-%Optionally, install a program for communicating on the RS232 port,
-%connected to the VSN.
-%Gtkterm is one viable option.
-%Search for \verb+gtkterm+ on Synaptic, and select it for installation.
-%See Figure \reg{fig:synaptic-gtkterm}.
-
-%    \begin{figure}[H]
-%    \centering
-%        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/synaptic-gtkterm.png}
-%        \caption{Selecting gtkterm for installation}
-%        \label{fig:synaptic-gtkterm}
-%    \end{figure}
-
-\subsubsection{Moserial}
+\subsubsection{CuteCom}
 
 Optionally, install a program for communicating on the RS232 port,
 connected to VESNA.
-Moserial is one viable option.
+CuteCom is one viable option, Moserial is another one.
+You can use any of these programs; note that CuteCom handles long
+RS232 captures much better than Moserial.
+
+Search for \verb+cutecom+ on Synaptic, and select it for installation.
+See Figure \ref{fig:synaptic-cutecom}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/synaptic-cutecom.png}
+        \caption{Selecting cutecom for installation}
+        \label{fig:synaptic-cutecom}
+    \end{figure}
+
+\subsubsection{Moserial}
+
 Search for \verb+moserial+ on Synaptic, and select it for installation.
 See Figure \ref{fig:synaptic-moserial}.
 
@@ -305,6 +323,16 @@ See Figure \ref{fig:synaptic-moserial}.
 
 
 The next step is to actually perform the installation of the above mentioned programs.
+
+\subsubsection{Git}
+
+Optionally you can install the programs to work with Git version control system.
+Inside Eclipse Git is handled by the EGit plugin, but sometimes it can be useful
+to manipulate Git repositories from outside Eclipse.
+
+To install git, search in synaptic for \verb+git gui+ and
+install the \verb+git-gui+ package for installation.
+This package will install as dependencies all of the commonly useful Git tools.
 
 \subsubsection{Performing the actual installation}
 
@@ -324,7 +352,8 @@ Click \emph{Apply}, wait for the installation to finish, and close Synaptic.
 \subsection{Installing Eclipse plugins}
 
 First, start Eclipse, by selecting in the menu Applications $\rightarrow$
-Programming $\rightarrow$ Eclipse.
+Programming $\rightarrow$ Eclipse,
+or Dash home, and search for Eclipse.
 
 After Eclipse starts, it will ask for a workspace, as shown on Figure \ref{fig:eclipse-workspace}.
 
@@ -354,47 +383,10 @@ Figure \ref{fig:eclipse-update}.
 % http://www.eclipse.org/forums/index.php?t=msg&goto=536316&
 % http://download.eclipse.org/tools/cdt/releases/galileo/
 % https://sites.google.com/site/stm32discovery/open-source-development-with-the-stm32-discovery/getting-hardware-debuging-working-with-eclipse-and-code-sourcey
-
-\subsubsection{Subversive SVN support}
-
-
-In the \emph{Work with} field, insert the main eclipse update site;
-for the Galileo release, it is
-\url{http://download.eclipse.org/releases/galileo/}.
-
-In the search filter, enter the text \emph{subversive};
-see Figure \ref{fig:eclipse-subversive}.
-
-    \begin{figure}[H]
-    \centering
-        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/eclipse-subversive.png}
-        \caption{Selecting Subversion support for Eclipse}
-        \label{fig:eclipse-subversive}
-    \end{figure}
-
-Check the \emph{Subversive SVN Integration} plugin, and click \emph{Next},
-\emph{Next}, select that you accept the license and click \emph{Finish}.
-
-When Eclipse asks about restarting the IDE, click \emph{Yes}.
-
-On the next start, the Subversive plugin will prompt for selecting
-SVN connectors, as shown on Figure \ref{fig:eclipse-subversive-setup}.
-
-    \begin{figure}[H]
-    \centering
-        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/eclipse-subversive-setup.png}
-        \caption{Selecting Subversion connectors for Eclipse}
-        \label{fig:eclipse-subversive-setup}
-    \end{figure}
-
-
-Select \emph{SVN Kit 1.3.0}, and click \emph{Finish}. Next, some additional plugins
-will be installed.
-Select \emph{Next},
-\emph{Next}, accept the license and click \emph{Finish}.
-When prompted, approve the installation of unsigned plugins,
-and finally restart eclipse, when asked.
-
+%
+% @NOTE: I think at the time of creating the development environment,
+% these tools were not available yet. For now it is not worth fixing something
+% that is working, but at some point we should experiment with better tools.
 
 \subsubsection{GNU ARM C/C++ development support}
 
@@ -422,10 +414,10 @@ and restart Eclipse when it's asking.
 
 \subsubsection{Zylin Embedded CDT}
 
-In eclipse, select again in the menu Help $\rightarrow$ Install new Software...
+In Eclipse, select again in the menu Help $\rightarrow$ Install new Software...
 
 In the \emph{Work with} field, enter the following URL:
-\url{http://www.zylin.com/zylincdt}.
+\url{http://opensource.zylin.com/zylincdt}.
 
 Select the \emph{Zylin Embedded CDT} plugin for installation,
 as depicted on Figure \ref{fig:eclipse-zylin}.
@@ -439,72 +431,168 @@ as depicted on Figure \ref{fig:eclipse-zylin}.
 
 Proceed with the installation as for GNU ARM C/C++ development support plugin.
 
+\subsection{Setting up authentication for GitHub}
 
-\subsection{Testing the setup}
-
-Now everything should be installed for software development.
-This section will help testing if the installed programs really work.
-
-\subsubsection{Creating a new project and importing the source code}
-
-In Eclipse, select \emph{File} $\rightarrow$ \emph{New} $\rightarrow$ \emph{Project...}.
-In the project type, select \emph{Project from SVN}, as shown on
-Figure \ref{fig:test-prj-svn}.
+In order to download the source code from GitHub, one needs to
+have a GitHub account and at least one SSH key pair set up for GitHub.
 
     \begin{figure}[H]
     \centering
-        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/test-prj-svn.png}
-        \caption{Creating a new project, from SVN}
-        \label{fig:test-prj-svn}
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-copied.png}
+        \caption{SSH keys at $ \sim/.ssh $ }
+        \label{fig:auth-copied}
+    \end{figure}
+
+In case you have the SSH key pair set up, then you can copy the key to
+the \verb+~/.ssh/+ folder,
+add the keys to EGit's list of keys and you are done.
+Note that you need to set up the correct permissions on the key files:
+the files must be owned by your user, and they can be readable only to
+your user.
+
+If you need to create an account and generate keys, then you can use the
+tool available in Eclipse, and proceed with account creation on GitHub.
+The key generator tool can be found at
+\emph{Window} $\rightarrow$ \emph{Preferences...}
+and search for \emph{SSH2}, then select
+\emph{General} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{SSH2} $\rightarrow$ \emph{Key Management}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-generate.png}
+        \caption{Generating SSH keys with Eclipse}
+        \label{fig:auth-generate}
+    \end{figure}
+
+For adding private SSH keys to Eclipse, go to
+\emph{Window} $\rightarrow$ \emph{Preferences...}
+and search for \emph{SSH2}, then select
+\emph{General} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{SSH2} $\rightarrow$ \emph{General}.
+There click \emph{Add private key...} and select the private key that you
+will use with GitHub.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-add-key.png}
+        \caption{Adding private keys to Eclipse}
+        \label{fig:auth-add-key}
+    \end{figure}
+
+\subsection{Testing the setup}
+
+
+Now everything should be installed for software development.
+This section guides through the testing of the installed programs
+and gives a short introductions to their functioning.
+
+Note that after installing the compiler tools, you will need to log out
+and log in before launching Eclipse. Otherwise you might get errors
+saying that the executable \verb+arm-none-eabi-gcc+ cannot be found.
+
+\subsubsection{Creating a new project and importing the source code}
+
+In Eclipse, select \emph{File} $\rightarrow$ \emph{Import...}.
+For the import source select \emph{Projects from Git}, as shown on
+Figure \ref{fig:test-prj-git}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/test-prj-git.png}
+        \caption{Import from Git}
+        \label{fig:test-prj-git}
     \end{figure}
 
 Click \emph{Next}.
 
     \begin{figure}[H]
     \centering
-        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-import-svn.png}
-        \caption{Importing a new project from SVN}
-        \label{fig:test-import-svn}
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-git-repo.png}
+        \caption{Select the Git repository}
+        \label{fig:test-select-git-repo}
     \end{figure}
 
-In the URL field, enter
-\verb+http://xpack.ijs.si/svn/vsnhellworld/+.
-Also enter your user name and password.
-If you are planning to use SVN extensively, it might be convenient to have your
-password saved by Eclipse.
-See Figure \ref{fig:test-import-svn}.
+Because the source code is not available in a local git repository, first
+download the source code by cloning the
+\verb+vesna-drivers+ repository.
+
+
+Click \emph{Clone...} and fill in the URI field with
+\verb+git@github.com:sensorlab/vesna-drivers.git+
 
     \begin{figure}[H]
     \centering
-        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-prj-head.png}
-        \caption{Selecting a revision from SVN}
-        \label{fig:test-prj-head}
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-cloning-settings.png}
+        \caption{Parameters of the repository to clone}
+        \label{fig:test-cloning-settings}
     \end{figure}
 
-Click \emph{Next}, and you should get the dialog shown on
-Figure \ref{fig:test-prj-head}.
-Click the control \emph{Head revision}, then \emph{Finish}.
+Click \emph{Next}.
 
     \begin{figure}[H]
     \centering
-        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-checkout-as.png}
-        \caption{Checking out the source as project}
-        \label{fig:test-checkout-as}
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-branches.png}
+        \caption{Selecting branches to clone}
+        \label{fig:test-select-branches}
     \end{figure}
 
-On the next step, shown on Figure \ref{fig:test-checkout-as}, select
-\emph{Find projects in children of selected resource} and click \emph{Finish}.
+Click \emph{Next}.
 
     \begin{figure}[H]
     \centering
-        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/test-project-select.png}
-        \caption{Checking out the source as project}
-        \label{fig:test-project-select}
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-clone-location.png}
+        \caption{Selecting the location of local repository}
+        \label{fig:test-clone-location}
     \end{figure}
 
-In the next dialog, depicted on
-Figure \ref{fig:test-project-select},
-click \emph{Finish}.
+For the destination directory select the
+vesna-drivers directory inside eclipse workspace.
+This way it's easier to manage the project.
+Click \emph{Finish}
+
+Now you can select the cloned repository, from which the project
+can be imported.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-repo.png}
+        \caption{Selecting the repository from which to import a project}
+        \label{fig:test-select-repo}
+    \end{figure}
+
+Click \emph{Next}.
+Select the \emph{Use new projects wizard}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-wizard.png}
+        \caption{Selecting the wizard that imports a project}
+        \label{fig:test-select-wizard}
+    \end{figure}
+
+Click \emph{Finish}.
+From the project types, select \emph{C/C++} $\rightarrow$
+\emph{Makefile Project with Existing Code}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-project-type.png}
+        \caption{Selecting the project type}
+        \label{fig:test-select-project-type}
+    \end{figure}
+
+Clink \emph{Next}.
+Set the name of the project to \verb+vesna-drivers+.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-project-name.png}
+        \caption{Selecting the project name}
+        \label{fig:test-project-name}
+    \end{figure}
+
+Click \emph{Finish}.
 
     \begin{figure}[H]
     \centering
@@ -513,7 +601,7 @@ click \emph{Finish}.
         \label{fig:test-got-project}
     \end{figure}
 
-Now you should get the sample project in Eclipse, see
+Now you should have the sample project in Eclipse, see
 Figure \ref{fig:test-got-project}.
 
 \subsubsection{Compiling the source}
@@ -531,9 +619,30 @@ See Figure \ref{fig:compile-c-perspective}.
     \end{figure}
 
 In this perspective,
-on the right side, there should be a \emph{Make targets} view. (compile-make.png).
-Select the helloWorld folder, and inside double-click \emph{Build HelloWorld}.
+on the right side, there should be a \emph{Make targets} view.
 
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/compile-make.png}
+        \caption{Make targets view}
+        \label{fig:compile-make}
+    \end{figure}
+
+Select the \emph{VESNADriversDemo} folder in the Make targets view,
+and right-click on it and select \emph{New} in the menu.
+Set the make target name to \verb+all+.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.4\textwidth]{./install-guide-linux-images/compile-add-target.png}
+        \caption{Adding a make target}
+        \label{fig:compile-add-target}
+    \end{figure}
+
+Other useful targets are \verb+clean+ for removing the build output files from the source 
+code and \verb+drivers_demo.load5+ for loading the application to VESNA.
+
+Click \emph{OK}, then double-click the newly created make target.
 If everything goes well, you should see similar lines in the console, as the text below:
 
     \begin{figure}[H]
@@ -546,6 +655,7 @@ If everything goes well, you should see similar lines in the console, as the tex
 Now the example project has compiled, and it's ready to be loaded on VESNA.
 
 \subsubsection{Uploading to the device}
+
 
 First, connect all the necessary cables to the debugger:
     \begin{itemize}
@@ -571,12 +681,6 @@ See Figure \ref{fig:moserial-config}.
         \label{fig:moserial-config}
     \end{figure}
 
-%    \begin{figure}[H]
-%    \centering
-%        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/gtkterm-config.png}
-%        \caption{Configuring gtkterm}
-%        \label{fig:gtkterm-config}
-%    \end{figure}
 
 The usual settings are:
 
@@ -631,36 +735,23 @@ on the serial terminal, as shown on Figure \ref{fig:hello-world}.
 
     \begin{figure}[H]
     \centering
-        \includegraphics[width=\textwidth]{./install-guide-linux-images/hello-world-moserial.png}
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/hello-world-cutecom.png}
         \caption{Hello world messages on serial terminal}
         \label{fig:hello-world}
     \end{figure}
 
-%    \begin{figure}[H]
-%    \centering
-%        \includegraphics[width=\textwidth]{./install-guide-linux-images/hello-world.png}
-%        \caption{Hello world messages on serial terminal}
-%        \label{fig:hello-world}
-%    \end{figure}
 
 By following these steps, you should be able to compile and load program to VESNA.
+
 
 \subsubsection{Testing debugging facilities}
 
 In order to debug in Eclipse, first the debug configurations have to be added.
-In eclipse, select on the toolbar \emph{Debug} $\rightarrow$ \emph{Organize favorites...}.
-
-    \begin{figure}[H]
-    \centering
-        \includegraphics[width=\textwidth]{./install-guide-linux-images/debug-organize-fav.png}
-        \caption{Organize the debug favorites}
-        \label{fig:debug-org-fav}
-    \end{figure}
-
+In Eclipse, select on the toolbar \emph{Debug} $\rightarrow$ \emph{Organize favorites...}.
 
 In the window that appears, click \emph{Add...},
-select both items, and click \emph{OK} and \emph{OK}. Illustrations can be found on
-Figure \ref{fig:debug-org-fav} and Figure \ref{fig:debug-add-fav}.
+select both items, and click \emph{OK} and \emph{OK}. Illustration can be found on
+\ref{fig:debug-add-fav}.
 
     \begin{figure}[H]
     \centering
@@ -689,7 +780,7 @@ and it must be stopped before reprogramming the VESNA.
 
 Next, start the actual program that will be debugged.
 For this, click on the \emph{Debug} icon on the toolbar, and select
-\emph{VSNHelloWorld Debug}
+\emph{OpenOCD-ARM-USB-OCD VESNA Drivers Debug}
 (Figure \ref{fig:debug-launch})
 
     \begin{figure}[H]
@@ -951,7 +1042,7 @@ $ make hello-world.u
 
 The yellow LED on the VESNA board should start blinking after programming is complete.
 To see messages sent to the serial port, you need to attach the serial
-connector on the Olimex ARM-USB-OCD to the VESNA's serial port. 
+connector on the Olimex ARM-USB-OCD to the VESNA's serial port.
 
 You then need to read the correct device file. If you don't have any
 other USB-to-serial adapters connected to the machine, this will usually be
@@ -964,7 +1055,7 @@ $ cat /dev/ttyUSB0
 \end{verbatim}
 
 You should now see a stream of \verb|Hello, world!| messages appear in the
-terminal. Of course, you can also use your serial terminal emulator of choice 
+terminal. Of course, you can also use your serial terminal emulator of choice
 
 \subsection{Debugging setup}
 
@@ -1015,8 +1106,9 @@ point to the location where you compiled libopencm3.
 
 \begin{thebibliography}{9}
 \bibitem{mm10}
-   Marko Mihelin, SensorLab VSN open source development environment setup manual for Windows based development,
-   2010
+	% FIXME update reference manual to "VESNA" manual
+   Marko Mihelin, SensorLab VESNA open source development environment setup manual for Windows based development,
+   2011
 
 \end{thebibliography}
 
