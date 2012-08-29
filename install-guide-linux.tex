@@ -75,10 +75,10 @@ instructions, generic steps will be also described.
 
 \begin{enumerate}
 \item Eclipse IDE with EGit, Zylin Embedded CDT
-\item Cross-compiler provided by Codesourcery Lite binary toolchain
+\item Cross-compiler provided by CodeSourcery Lite binary toolchain
 	distribution
-\item openOCD on-chip debugger
-\item moserial or cuteCom serial terminal
+\item OpenOCD on-chip debugger
+\item moserial or CuteCom serial terminal
 \item Steps performed on Ubuntu 10.10, 32 bit distribution
 \end{enumerate}
 
@@ -87,7 +87,7 @@ instructions, generic steps will be also described.
 \begin{enumerate}
 \item Text editor and terminal emulator of choice, GNU make, GNU debugger
 \item Cross-compiler compiled from official GNU sources
-\item openOCD on-chip debugger
+\item OpenOCD on-chip debugger
 \item Steps performed on Debian 6.0 (Squeeze), amd64 architecture
 \end{enumerate}
 
@@ -146,14 +146,14 @@ Select \emph{No}, and press enter.
 
 Finally close the terminal window.
 In order to apply these changes, you must either log out and log in,
-or launch eclipse from a terminal.
+or launch Eclipse from a terminal.
 Otherwise you will get errors when you are trying to compile the source code.
 It is recommended to log out and log in after
 competing section \ref{sect:change-path}, in order to avoid one extra logout and login.
 
-\subsubsection{Installing the Codesourcery Lite toolchain}
+\subsubsection{Installing the CodeSourcery Lite toolchain}
 
-The Codesourcery Lite toolchain contains
+The CodeSourcery Lite toolchain contains
 the compiler, linker, debugger, and other utilities needed for
 ARM development.
 
@@ -177,13 +177,13 @@ In this case, the folder is called arm-2010q1.
 The next step is to make the system know about the location of the tools;
 this is achieved by setting up the PATH for the current user.
 
-\subsubsection{Inserting the directory of the Codesourcery toolchain in the PATH}
+\subsubsection{Inserting the directory of the CodeSourcery toolchain in the PATH}
 
     \label{sect:change-path}
 The \verb+PATH+ variable stores a list of directories, where various
-program executable can be found. In order to make Eclipse to know about the
+program executables can be found. In order to make Eclipse know about the
 ARM development tools, the directory containing the tools must be inserted
-in this list.
+into this list.
 
 Select from the menu Applications $\rightarrow$ Accessories $\rightarrow$ Text Editor,
 and click open. Navigate to your home folder, then right click on the file list,
@@ -231,7 +231,7 @@ log out and log in back, in order to apply the performed changes.
 Programs provided by Linux distributions can be installed by using the package management system.
 On Ubuntu, the Synaptic package manager is recommended.
 Other distributions have equivalent tools for package management.
-If Synapcit is not installed, the you can install it first by using
+If Synaptic is not installed, the you can install it first by using
 Ubuntu Software Center.
 
 Open Synaptic by selecting in the menu System $\rightarrow$ Administration $\rightarrow$
@@ -276,7 +276,7 @@ EGit is used in Eclipse for supporting the Git version control system.
         \label{fig:synapic-eclipse-egit.png}
     \end{figure}
 
-\subsubsection{openOCD}
+\subsubsection{OpenOCD}
 
 Still in Synaptic, search for package called \verb+openocd+,
 and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
@@ -296,7 +296,7 @@ Optionally, install a program for communicating on the RS232 port,
 connected to VESNA.
 CuteCom is one viable option, Moserial is another one.
 You can use any of these programs; note that CuteCom handles long
-RS232 caputres much better than Moserial.
+RS232 captures much better than Moserial.
 
 Search for \verb+cutecom+ on Synaptic, and select it for installation.
 See Figure \ref{fig:synaptic-cutecom}.
@@ -414,7 +414,7 @@ and restart Eclipse when it's asking.
 
 \subsubsection{Zylin Embedded CDT}
 
-In eclipse, select again in the menu Help $\rightarrow$ Install new Software...
+In Eclipse, select again in the menu Help $\rightarrow$ Install new Software...
 
 In the \emph{Work with} field, enter the following URL:
 \url{http://opensource.zylin.com/zylincdt}.
@@ -431,10 +431,10 @@ as depicted on Figure \ref{fig:eclipse-zylin}.
 
 Proceed with the installation as for GNU ARM C/C++ development support plugin.
 
-\subsection{Setting up authentication for Github}
+\subsection{Setting up authentication for GitHub}
 
-In order to download the source code from github, one needs to
-have a github account and at least one SSH key pair set up for github.
+In order to download the source code from GitHub, one needs to
+have a GitHub account and at least one SSH key pair set up for GitHub.
 
     \begin{figure}[H]
     \centering
@@ -450,12 +450,12 @@ Note that you need to set up the correct permissions on the key files:
 the files must be owned by your user, and they can be readable only to
 your user.
 
-If you need to create account and generate keys, then you can use the
-tool available in Eclipse, and proceed with account creation on github.
+If you need to create an account and generate keys, then you can use the
+tool available in Eclipse, and proceed with account creation on GitHub.
 The key generator tool can be found at
 \emph{Window} $\rightarrow$ \emph{Preferences...}
 and search for \emph{SSH2}, then select
-\emph{Genera} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{General} $\rightarrow$ \emph{Network Connection} $\rightarrow$
 \emph{SSH2} $\rightarrow$ \emph{Key Management}.
 
     \begin{figure}[H]
@@ -468,10 +468,10 @@ and search for \emph{SSH2}, then select
 For adding private SSH keys to Eclipse, go to
 \emph{Window} $\rightarrow$ \emph{Preferences...}
 and search for \emph{SSH2}, then select
-\emph{Genera} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{General} $\rightarrow$ \emph{Network Connection} $\rightarrow$
 \emph{SSH2} $\rightarrow$ \emph{General}.
 There click \emph{Add private key...} and select the private key that you
-will use with Github.
+will use with GitHub.
 
     \begin{figure}[H]
     \centering
@@ -573,7 +573,7 @@ Select the \emph{Use new projects wizard}.
 
 Click \emph{Finish}.
 From the project types, select \emph{C/C++} $\rightarrow$
-\emph{Makefile Project with Exiting Code}.
+\emph{Makefile Project with Existing Code}.
 
     \begin{figure}[H]
     \centering
@@ -639,9 +639,8 @@ Set the make target name to \verb+all+.
         \label{fig:compile-add-target}
     \end{figure}
 
-Other useful targets are \verb+clean+ for cleaning the source code from the
-build output and \verb+drivers_demo.load5+ for loading the application
-to VESNA.
+Other useful targets are \verb+clean+ for removing the build output files from the source 
+code and \verb+drivers_demo.load5+ for loading the application to VESNA.
 
 Click \emph{OK}, then double-click the newly created make target.
 If everything goes well, you should see similar lines in the console, as the text below:
@@ -748,7 +747,7 @@ By following these steps, you should be able to compile and load program to VESN
 \subsubsection{Testing debugging facilities}
 
 In order to debug in Eclipse, first the debug configurations have to be added.
-In eclipse, select on the toolbar \emph{Debug} $\rightarrow$ \emph{Organize favorites...}.
+In Eclipse, select on the toolbar \emph{Debug} $\rightarrow$ \emph{Organize favorites...}.
 
 In the window that appears, click \emph{Add...},
 select both items, and click \emph{OK} and \emph{OK}. Illustration can be found on
