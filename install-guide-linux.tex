@@ -1,0 +1,1115 @@
+\documentclass[a4paper, 10pt]{article}
+
+% \usepackage{verbatim}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{graphicx}
+
+\usepackage{float}
+
+\usepackage{hyperref}
+
+\title{SensorLab VESNA open source development environment setup manual for Linux based development}
+\author{Zoltan Padrah}
+
+\begin{document}
+
+% title page
+\begin{titlepage}
+    \begin{center}
+    \textbf{
+        \raisebox{-0.4\height}{
+            \includegraphics[width=1cm]{./install-guide-linux-images/jsi-logo.png}
+        }
+        \Large ``Jožef Stefan'' Institute \\[2mm]
+        \raisebox{-0.4\height}{
+            \includegraphics[width=1cm]{./install-guide-linux-images/comms-logo.png}
+        }
+        Department of Communication Systems\\[2mm]
+        \includegraphics[height=1cm]{./install-guide-linux-images/sensorlab-logo.png}
+        }\\
+
+    \vfill
+
+    \textbf{\huge SensorLab VESNA open source development environment setup manual
+        for Linux based development}\\[1.5cm]
+
+
+    \textbf{ \Large
+    version 0.10}\\[1cm]
+
+    \textnormal{\Large
+    by Zoltan Padrah, Tomaž Šolc}\\[1cm]
+
+    \vfill
+
+    \textnormal{\large
+    \today\\[1cm]
+    }
+    \end{center}
+\end{titlepage}
+
+
+\section{Introduction}
+
+This document describes the installation of a cross-compiler and associated
+development tools required to compile and debug software for VESNA wireless
+sensor node on a GNU/Linux operating system.
+
+It offers two distinct approaches to development: one that focuses on graphical
+interaction and an integrated development environment (IDE) and one focused on
+command-line interfaces and scripting. A short overview of both is given below
+- they are identical in regard to functionality and it is up to the reader to
+choose the approach that he or she finds most convenient.
+
+The graphical approach is recommended for new developers and those moving from a
+Windows development environment. Developers with a background in free open
+source software development will likely prefer the command-line way.
+
+The exact steps are performed on a specific distribution mentioned, but the
+document should be applicable to any distribution. Besides distribution-specific
+instructions, generic steps will be also described.
+
+\subsection{Graphical way}
+
+\begin{enumerate}
+\item Eclipse IDE with EGit, Zylin Embedded CDT
+\item Cross-compiler provided by CodeSourcery Lite binary toolchain
+	distribution
+\item OpenOCD on-chip debugger
+\item moserial or CuteCom serial terminal
+\item Steps performed on Ubuntu 10.10, 32 bit distribution
+\end{enumerate}
+
+\subsection{Command-line way}
+
+\begin{enumerate}
+\item Text editor and terminal emulator of choice, GNU make, GNU debugger
+\item Cross-compiler compiled from official GNU sources
+\item OpenOCD on-chip debugger
+\item Steps performed on Debian 6.0 (Squeeze), amd64 architecture
+\end{enumerate}
+
+\newpage
+
+\tableofcontents
+\newpage
+
+\listoffigures
+\newpage
+
+\subsection*{List of Abbreviations}
+	\begin{tabular}{ l l }
+    CDT	    & C/C++ Development Tooling \\
+%    SVN     & Apache Subversion \\
+	SSH		& Secure Shell \\
+	\end{tabular}
+\newpage
+
+
+\section{Graphical way}
+
+\subsection{Preparing the system and installing custom software}
+
+% This section includes special steps, that
+
+\subsubsection{Setting up bash as the default shell in the system}
+
+In order to be able to run in Eclipse external programs from special locations
+(in our case, the compiler and other needed tools),
+the default shell for script execution must be changed.
+Otherwise the default system shell (dash) will be launched by Eclipse,
+and the compiler won't be found.
+
+This can be achieved by launching Applications $\rightarrow$ Accessories $\rightarrow$ Terminal,
+copying the following command in it:
+
+\begin{verbatim}
+sudo dpkg-reconfigure dash
+\end{verbatim}
+
+and pressing Enter.
+
+You will be asked for your password,
+and after that a question will be presented, asking
+if dash should be installed as default system shell.
+See Figure \ref{fig:set-dash-default}.
+Select \emph{No}, and press enter.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/set-dash-default.png}
+        \caption{Setting the default shell to bash, instead of dash}
+        \label{fig:set-dash-default}
+    \end{figure}
+
+Finally close the terminal window.
+In order to apply these changes, you must either log out and log in,
+or launch Eclipse from a terminal.
+Otherwise you will get errors when you are trying to compile the source code.
+It is recommended to log out and log in after
+competing section \ref{sect:change-path}, in order to avoid one extra logout and login.
+
+\subsubsection{Installing the CodeSourcery Lite toolchain}
+
+The CodeSourcery Lite toolchain contains
+the compiler, linker, debugger, and other utilities needed for
+ARM development.
+
+Go to
+\url{http://www.codesourcery.com/sgpp/lite/arm/portal/subscription?@template=lite},
+select \emph{EABI} as Target OS, and click on the
+\emph{All versions} link.
+% \emph{Sourcery G++ Lite \textit{version}} link.
+As of date of writing, the latest version is 2010.09-51, but
+due to compatibility problems during debugging, the recommended version is \emph{2010q1-188}.
+For details, see section \ref{sect:gdb-problems} in Troubleshooting part.
+The direct link to the recommended version is
+\url{https://sourcery.mentor.com/GNUToolchain/package6493/public/arm-none-eabi/arm-2010q1-188-arm-none-eabi-i686-pc-linux-gnu.tar.bz2}.
+
+On the webpage, select \emph{IA32 GNU/Linux TAR},
+and save the received file.
+Next, open the file, and extract its contents into your home folder.
+This way, you should have a folder named arm-\textit{version} in your home directory.
+In this case, the folder is called arm-2010q1.
+
+The next step is to make the system know about the location of the tools;
+this is achieved by setting up the PATH for the current user.
+
+\subsubsection{Inserting the directory of the CodeSourcery toolchain in the PATH}
+
+    \label{sect:change-path}
+The \verb+PATH+ variable stores a list of directories, where various
+program executables can be found. In order to make Eclipse know about the
+ARM development tools, the directory containing the tools must be inserted
+into this list.
+
+Select from the menu Applications $\rightarrow$ Accessories $\rightarrow$ Text Editor,
+and click open. Navigate to your home folder, then right click on the file list,
+and select from the menu \emph{Show hidden files}. This operation is depicted on Figure
+\ref{fig:show-hidden-files}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/show-all-files.png}
+        \caption{Opening hidden files for editing}
+        \label{fig:show-hidden-files}
+    \end{figure}
+
+From the list, select the file \verb+.bashrc+. Note that hidden files in Linux
+have their name starting with a dot (.).
+
+Select the file called \verb+.bashrc+ and insert the following text in it,
+close to the beginning:
+
+\begin{verbatim}
+export PATH=$PATH:$HOME/arm-2010q1/bin
+\end{verbatim}
+
+See Figure \ref{fig:editing-bashrc} for example. If you selected different CodeSourcery version,
+then replace the text \verb+2010q1+ accordingly.
+
+Note: the new line in the file needs to be placed before the block
+\emph{\# If not running interactively, don't do anything},
+in order to change the PATH variable in all situations,
+including the case when compiling programs from Eclipse.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/editing-bashrc.png}
+        \caption{Editing .bashrc}
+        \label{fig:editing-bashrc}
+    \end{figure}
+
+Save the file and close the text editor.
+After competing these operations, and before launching Eclipse, it is needed to
+log out and log in back, in order to apply the performed changes.
+
+\subsection{Installing programs provided as packages by the distribution}
+
+Programs provided by Linux distributions can be installed by using the package management system.
+On Ubuntu, the Synaptic package manager is recommended.
+Other distributions have equivalent tools for package management.
+If Synaptic is not installed, the you can install it first by using
+Ubuntu Software Center.
+
+Open Synaptic by selecting in the menu System $\rightarrow$ Administration $\rightarrow$
+Synaptic Package Manager,
+or Dash home, and write Synaptic in the search field.
+
+\subsubsection{Eclipse}
+
+In Synaptic select Edit $\rightarrow$ Search, or Ctrl+F, and enter \verb+eclipse+
+in the search box. Right click the package called
+\verb+eclipse-cdt+ and select \emph{Mark for installation}.
+See Figure \ref{fig:synaptic-eclipse}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/synaptic-eclipse.png}
+        \caption{Selecting eclipse-cdt for installation}
+        \label{fig:synaptic-eclipse}
+    \end{figure}
+
+After this a dialog should pop up, asking if the other, needed packages should be installed,
+see Figure \ref{fig:synaptic-eclipse-extra-packages.png}. Click \emph{Mark}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.5\textwidth]{./install-guide-linux-images/synaptic-eclipse-extra-packages.png}
+        \caption{Extra packages required by eclipse-cdt}
+        \label{fig:synaptic-eclipse-extra-packages.png}
+    \end{figure}
+
+\subsubsection{Eclipse Git plugin (EGit)}
+
+From the search results in synaptic, also select the package
+\verb+eclipse-egit+ for installation, see
+Figure \ref{fig:synapic-eclipse-egit.png}.
+EGit is used in Eclipse for supporting the Git version control system.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/synaptic-eclipse-egit.png}
+        \caption{Selecting eclipse-egit for installation}
+        \label{fig:synapic-eclipse-egit.png}
+    \end{figure}
+
+\subsubsection{OpenOCD}
+
+Still in Synaptic, search for package called \verb+openocd+,
+and mark it for installation, as shown on Figure \ref{fig:synaptic-openocd}.
+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/synaptic-openocd.png}
+        \caption{Selecting openocd for installation}
+        \label{fig:synaptic-openocd}
+    \end{figure}
+
+
+\subsubsection{CuteCom}
+
+Optionally, install a program for communicating on the RS232 port,
+connected to VESNA.
+CuteCom is one viable option, Moserial is another one.
+You can use any of these programs; note that CuteCom handles long
+RS232 captures much better than Moserial.
+
+Search for \verb+cutecom+ on Synaptic, and select it for installation.
+See Figure \ref{fig:synaptic-cutecom}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/synaptic-cutecom.png}
+        \caption{Selecting cutecom for installation}
+        \label{fig:synaptic-cutecom}
+    \end{figure}
+
+\subsubsection{Moserial}
+
+Search for \verb+moserial+ on Synaptic, and select it for installation.
+See Figure \ref{fig:synaptic-moserial}.
+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/synaptic-moserial.png}
+        \caption{Selecting moserial for installation}
+        \label{fig:synaptic-moserial}
+    \end{figure}
+
+
+The next step is to actually perform the installation of the above mentioned programs.
+
+\subsubsection{Git}
+
+Optionally you can install the programs to work with Git version control system.
+Inside Eclipse Git is handled by the EGit plugin, but sometimes it can be useful
+to manipulate Git repositories from outside Eclipse.
+
+To install git, search in synaptic for \verb+git gui+ and
+install the \verb+git-gui+ package for installation.
+This package will install as dependencies all of the commonly useful Git tools.
+
+\subsubsection{Performing the actual installation}
+
+Finally, click \emph{Apply} in Synaptic.
+A window as the one shown on Figure \ref{fig:synaptic-apply-changes.png}
+should appear.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/synaptic-apply-changes.png}
+        \caption{Selecting openocd for installation}
+        \label{fig:synaptic-apply-changes.png}
+    \end{figure}
+
+Click \emph{Apply}, wait for the installation to finish, and close Synaptic.
+
+\subsection{Installing Eclipse plugins}
+
+First, start Eclipse, by selecting in the menu Applications $\rightarrow$
+Programming $\rightarrow$ Eclipse,
+or Dash home, and search for Eclipse.
+
+After Eclipse starts, it will ask for a workspace, as shown on Figure \ref{fig:eclipse-workspace}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/eclipse-workspace.png}
+        \caption{Selecting Eclipse workspace}
+        \label{fig:eclipse-workspace}
+    \end{figure}
+
+The default workspace location should be good in most cases, so click \emph{OK}.
+
+In Eclipse, select in the menu Help $\rightarrow$ Install new Software..., as shown in
+Figure \ref{fig:eclipse-update}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/eclipse-update.png}
+        \caption{Search for Eclipse plugins to install}
+        \label{fig:eclipse-update}
+    \end{figure}
+
+
+% Galileo Update Site - http://download.eclipse.org/releases/galileo/
+
+% NOTE: why don't use Eclipse Hardware debugger instead of Zylin CDT?
+% http://www.eclipse.org/forums/index.php?t=msg&goto=536316&
+% http://download.eclipse.org/tools/cdt/releases/galileo/
+% https://sites.google.com/site/stm32discovery/open-source-development-with-the-stm32-discovery/getting-hardware-debuging-working-with-eclipse-and-code-sourcey
+%
+% @NOTE: I think at the time of creating the development environment,
+% these tools were not available yet. For now it is not worth fixing something
+% that is working, but at some point we should experiment with better tools.
+
+\subsubsection{GNU ARM C/C++ development support}
+
+Again, select in the menu Help $\rightarrow$ Install new Software... as shown in
+Figure \ref{fig:eclipse-update}.
+
+In the install window, paste in the \emph{Work with} field
+the following URL:
+\url{http://gnuarmeclipse.sourceforge.net/updates} and press Enter.
+The list in the middle of the window should have an item, as shown on
+Figure \ref{fig:eclipse-gnu-arm}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/eclipse-gnu-arm.png}
+        \caption{Selecting GNU ARM C/C++ development for Eclipse}
+        \label{fig:eclipse-gnu-arm}
+    \end{figure}
+
+Check the \emph{GNU ARM C/C++ Development Plugin} and click \emph{Next},
+\emph{Next}, select that you accept the license and click \emph{Finish}.
+
+Finally approve the installation of unsigned software,
+and restart Eclipse when it's asking.
+
+\subsubsection{Zylin Embedded CDT}
+
+In Eclipse, select again in the menu Help $\rightarrow$ Install new Software...
+
+In the \emph{Work with} field, enter the following URL:
+\url{http://opensource.zylin.com/zylincdt}.
+
+Select the \emph{Zylin Embedded CDT} plugin for installation,
+as depicted on Figure \ref{fig:eclipse-zylin}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/eclipse-zylin.png}
+        \caption{Selecting Zylin Embedded CDT plugin for Eclipse}
+        \label{fig:eclipse-zylin}
+    \end{figure}
+
+Proceed with the installation as for GNU ARM C/C++ development support plugin.
+
+\subsection{Setting up authentication for GitHub}
+
+In order to download the source code from GitHub, one needs to
+have a GitHub account and at least one SSH key pair set up for GitHub.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-copied.png}
+        \caption{SSH keys at $ \sim/.ssh $ }
+        \label{fig:auth-copied}
+    \end{figure}
+
+In case you have the SSH key pair set up, then you can copy the key to
+the \verb+~/.ssh/+ folder,
+add the keys to EGit's list of keys and you are done.
+Note that you need to set up the correct permissions on the key files:
+the files must be owned by your user, and they can be readable only to
+your user.
+
+If you need to create an account and generate keys, then you can use the
+tool available in Eclipse, and proceed with account creation on GitHub.
+The key generator tool can be found at
+\emph{Window} $\rightarrow$ \emph{Preferences...}
+and search for \emph{SSH2}, then select
+\emph{General} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{SSH2} $\rightarrow$ \emph{Key Management}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-generate.png}
+        \caption{Generating SSH keys with Eclipse}
+        \label{fig:auth-generate}
+    \end{figure}
+
+For adding private SSH keys to Eclipse, go to
+\emph{Window} $\rightarrow$ \emph{Preferences...}
+and search for \emph{SSH2}, then select
+\emph{General} $\rightarrow$ \emph{Network Connection} $\rightarrow$
+\emph{SSH2} $\rightarrow$ \emph{General}.
+There click \emph{Add private key...} and select the private key that you
+will use with GitHub.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/auth-add-key.png}
+        \caption{Adding private keys to Eclipse}
+        \label{fig:auth-add-key}
+    \end{figure}
+
+\subsection{Testing the setup}
+
+
+Now everything should be installed for software development.
+This section guides through the testing of the installed programs
+and gives a short introductions to their functioning.
+
+Note that after installing the compiler tools, you will need to log out
+and log in before launching Eclipse. Otherwise you might get errors
+saying that the executable \verb+arm-none-eabi-gcc+ cannot be found.
+
+\subsubsection{Creating a new project and importing the source code}
+
+In Eclipse, select \emph{File} $\rightarrow$ \emph{Import...}.
+For the import source select \emph{Projects from Git}, as shown on
+Figure \ref{fig:test-prj-git}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/test-prj-git.png}
+        \caption{Import from Git}
+        \label{fig:test-prj-git}
+    \end{figure}
+
+Click \emph{Next}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-git-repo.png}
+        \caption{Select the Git repository}
+        \label{fig:test-select-git-repo}
+    \end{figure}
+
+Because the source code is not available in a local git repository, first
+download the source code by cloning the
+\verb+vesna-drivers+ repository.
+
+
+Click \emph{Clone...} and fill in the URI field with
+\verb+git@github.com:sensorlab/vesna-drivers.git+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-cloning-settings.png}
+        \caption{Parameters of the repository to clone}
+        \label{fig:test-cloning-settings}
+    \end{figure}
+
+Click \emph{Next}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-branches.png}
+        \caption{Selecting branches to clone}
+        \label{fig:test-select-branches}
+    \end{figure}
+
+Click \emph{Next}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-clone-location.png}
+        \caption{Selecting the location of local repository}
+        \label{fig:test-clone-location}
+    \end{figure}
+
+For the destination directory select the
+vesna-drivers directory inside eclipse workspace.
+This way it's easier to manage the project.
+Click \emph{Finish}
+
+Now you can select the cloned repository, from which the project
+can be imported.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-repo.png}
+        \caption{Selecting the repository from which to import a project}
+        \label{fig:test-select-repo}
+    \end{figure}
+
+Click \emph{Next}.
+Select the \emph{Use new projects wizard}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-wizard.png}
+        \caption{Selecting the wizard that imports a project}
+        \label{fig:test-select-wizard}
+    \end{figure}
+
+Click \emph{Finish}.
+From the project types, select \emph{C/C++} $\rightarrow$
+\emph{Makefile Project with Existing Code}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-select-project-type.png}
+        \caption{Selecting the project type}
+        \label{fig:test-select-project-type}
+    \end{figure}
+
+Clink \emph{Next}.
+Set the name of the project to \verb+vesna-drivers+.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-project-name.png}
+        \caption{Selecting the project name}
+        \label{fig:test-project-name}
+    \end{figure}
+
+Click \emph{Finish}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.9\textwidth]{./install-guide-linux-images/test-got-project.png}
+        \caption{Checking out the source as project}
+        \label{fig:test-got-project}
+    \end{figure}
+
+Now you should have the sample project in Eclipse, see
+Figure \ref{fig:test-got-project}.
+
+\subsubsection{Compiling the source}
+
+In Eclipse, open the C/C++ perspective,  by selecting \emph{Window} $\rightarrow$
+\emph{Open perspective} $\rightarrow$ Other...,
+and clicking \emph{C/C++} and \emph{OK}.
+See Figure \ref{fig:compile-c-perspective}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/compile-c-perspective.png}
+        \caption{Open the C/C++ perspective}
+        \label{fig:compile-c-perspective}
+    \end{figure}
+
+In this perspective,
+on the right side, there should be a \emph{Make targets} view.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/compile-make.png}
+        \caption{Make targets view}
+        \label{fig:compile-make}
+    \end{figure}
+
+Select the \emph{VESNADriversDemo} folder in the Make targets view,
+and right-click on it and select \emph{New} in the menu.
+Set the make target name to \verb+all+.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.4\textwidth]{./install-guide-linux-images/compile-add-target.png}
+        \caption{Adding a make target}
+        \label{fig:compile-add-target}
+    \end{figure}
+
+Other useful targets are \verb+clean+ for removing the build output files from the source 
+code and \verb+drivers_demo.load5+ for loading the application to VESNA.
+
+Click \emph{OK}, then double-click the newly created make target.
+If everything goes well, you should see similar lines in the console, as the text below:
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/compile-result.png}
+        \caption{Console window contents, after a successful compilation}
+        \label{fig:compile-result}
+    \end{figure}
+
+Now the example project has compiled, and it's ready to be loaded on VESNA.
+
+\subsubsection{Uploading to the device}
+
+
+First, connect all the necessary cables to the debugger:
+    \begin{itemize}
+    \item RS232 cable
+    \item JTAG cable
+    \item power supply
+    \end{itemize}
+and plug the debugger into a USB slot on the PC.
+
+Then, it's recommended to launch the RS232 monitoring program.
+In order to do this, select from the menu
+% Applications $\rightarrow$ Accessories $\rightarrow$ Serial port terminal.
+Applications $\rightarrow$ Accessories $\rightarrow$ moserial Terminal.
+Inside the program, click on the serial port configuration icon.
+% Configuration $\rightarrow$ Port.
+% See Figure \ref{fig:gtkterm-config}.
+See Figure \ref{fig:moserial-config}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{./install-guide-linux-images/moserial-config.png}
+        \caption{Configuring moserial}
+        \label{fig:moserial-config}
+    \end{figure}
+
+
+The usual settings are:
+
+    \smallskip
+    \begin{tabular}{ l l }
+    Port         & /dev/ttyUSB0 \\
+    Speed        & 115200       \\
+    Parity       & even         \\
+    Bits         & 8            \\
+    Stop bits    & 1            \\
+    Flow control & none         \\
+    \end{tabular}
+    \smallskip
+
+Note that the port might be different if you are using serial ports on the PC
+(in that case, the port could be /dev/ttyS0, /dev/ttyS1, ...)
+or if you have more serial devices attached on USB (/dev/ttyUSB1, /dev/ttyUSB2, ...).
+
+After applying appropriate settings, click the first button on the toolbar for
+activating the serial port connection.
+
+Now, in Eclipse, select
+in the menu
+Run $\rightarrow$ External Tools $\rightarrow$ Organize Favorites,
+select \emph{Add}, check both items and click \emph{OK} and \emph{OK}.
+See Figure \ref{fig:compile-external-tools}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/compile-external-tools.png}
+        \caption{Adding external tools}
+        \label{fig:compile-external-tools}
+    \end{figure}
+
+In order to load the program select
+Run $\rightarrow$ External Tools $\rightarrow$ OpenOCD-ARM-USB-OCD Load.
+
+In the console in Eclipse, you should see the messages depicted on
+Figure \ref{fig:load-successful},
+after about 5 seconds
+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/load-successful.png}
+        \caption{Console window contents, after uploading the code to the device}
+        \label{fig:load-successful}
+    \end{figure}
+
+After these messages appear, VESNA should start printing hello world messages
+on the serial terminal, as shown on Figure \ref{fig:hello-world}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/hello-world-cutecom.png}
+        \caption{Hello world messages on serial terminal}
+        \label{fig:hello-world}
+    \end{figure}
+
+
+By following these steps, you should be able to compile and load program to VESNA.
+
+
+\subsubsection{Testing debugging facilities}
+
+In order to debug in Eclipse, first the debug configurations have to be added.
+In Eclipse, select on the toolbar \emph{Debug} $\rightarrow$ \emph{Organize favorites...}.
+
+In the window that appears, click \emph{Add...},
+select both items, and click \emph{OK} and \emph{OK}. Illustration can be found on
+\ref{fig:debug-add-fav}.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/debug-add-fav.png}
+        \caption{Adding debug favorites}
+        \label{fig:debug-add-fav}
+    \end{figure}
+
+In order to be able to debug programs running on VESNA,
+a debug server must be started.
+In this case, the debug server is called OpenOCD.
+Note that while the debug server is running, VESNA cannot be reprogrammed.
+Starting the debug server can be performed by clicking on the
+\emph{Debug} icon on the toolbar, and selecting
+\emph{OpenOCD-ARM-USB-OCD Debug}.
+See Figure \ref{fig:debug-openocd-start}.
+Launching the debug server is necessary every time a new debug session is started,
+and it must be stopped before reprogramming the VESNA.
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/debug-openocd-start.png}
+        \caption{Starting OpenOCD debug server}
+        \label{fig:debug-openocd-start}
+    \end{figure}
+
+Next, start the actual program that will be debugged.
+For this, click on the \emph{Debug} icon on the toolbar, and select
+\emph{OpenOCD-ARM-USB-OCD VESNA Drivers Debug}
+(Figure \ref{fig:debug-launch})
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/debug-launch.png}
+        \caption{Launching the program for debugging}
+        \label{fig:debug-launch}
+    \end{figure}
+
+Now it's recommended to switch to the debug perspective,
+for efficient debugging.
+Click the \emph{Debug} icon on the upper right corner of the Eclipse window.
+The debug perspective is depicted on Figure \ref{fig:debug-window}.
+
+
+    \begin{figure}[H]
+    \centering
+        \includegraphics[width=\textwidth]{./install-guide-linux-images/debug-window.png}
+        \caption{Debug perspective}
+        \label{fig:debug-window}
+    \end{figure}
+
+The marked elements on Figure \ref{fig:debug-window} are:
+    \begin{itemize}
+    \item[(a)] Program flow control and the running processes.
+        Note that the list also contains OpenOCD, the debug server,
+        and the program being debugged, including the stack(s).
+    \item[(b)] Source code view
+    \item[(c)] The line being executed.
+    \item[(d)] The outline of the current source code.
+        In the upper region there are the lists of breakpoints, register values,
+        variables.
+    \item[(e)] Debugging console.
+    \end{itemize}
+
+At the end of debugging, the executed program and also the
+debug server should be stopped.
+
+\subsection{Troubleshooting}
+
+This section tries to give fixes to common problems.
+The list might be incomplete, so feel free to contact the author for including
+new entries in this section.
+
+\subsubsection{Error while starting the debugger: ``Remote 'g' packet is too long: ...''}
+
+\label{sect:gdb-problems}
+This problem is caused by incompatible versions of OpenOCD and CodeSourcery debugger.
+See a discussion about this topic at OpenOCD mailing list:
+\url{https://lists.berlios.de/pipermail/openocd-development/2010-December/017349.html}
+
+Below is a table of OpenOCD and CodeSourcery toolchain versions that are known to work:
+
+    \smallskip
+    \begin{tabular}{ l | l }
+    CodeSourcery version & OpenOCD version \\
+    \hline
+    2010q1-188          &   0.4.0-1+nmu1 (Ubuntu 10.10 package) \\
+    % add other versions here, if needed
+    \end{tabular}
+    \smallskip
+
+Table of not working combinations:
+
+    \smallskip
+    \begin{tabular}{ l | l }
+    CodeSourcery version & OpenOCD version \\
+    \hline
+    2010.09-51          &   0.4.0-1+nmu1 (Ubuntu 10.10 package) \\
+    % add other versions here, if needed
+    \end{tabular}
+    \smallskip
+
+Combinations not appearing in any of the tables have not been tested.
+
+\subsubsection{OpenOCD prints error about stm32.flash
+    when attempting to upload program,
+    on Ubuntu 10.04 LTS}
+
+This problem is caused by the old version of OpenOCD (v3.1)
+supplied with Ubuntu 10.04.
+A simple workaround is to temporarily add the Ubuntu 10.10 package repositories
+to the system update sources and install version 4 of OpenOCD from there.
+After installing OpenOCD, remove the extra repositories,
+because installing software from different version of the same distribution
+might cause problems.
+
+
+\newpage
+
+\section{Command-line way}
+
+The following instructions assume you are working in a terminal emulator,
+either a text-mode virtual console or a graphical emulator. If you are using the
+default GNOME environment, you can open one from the Applications, Accessories,
+Terminal menu entry.
+
+Command lines starting with dollar sign (\verb|$|) are to be executed under your
+normal user privileges. Lines starting with a hash sign (\verb|#|) should be
+executed as root using \verb|su| or \verb|sudo|, depending on your system
+configuration.
+
+A backslash (\verb|\|) at the end of the line means the command continues on the
+next line without a carriage return.
+
+\subsection{Installing dependencies}
+
+All of the software that we will compile from source will be installed into
+your home directory. This approach was chosen so that the time required to
+work with elevated privileges is minimal and hence minimize the chances of the
+installation affecting other users or software on your system. However, before
+we can do that, we need to install some prerequisite software through the
+system's package manager.
+
+Perform the following command as root and confirm installation of packages
+when prompted:
+
+\begin{verbatim}
+# aptitude install libgmp3-dev \
+libncurses5-dev \
+libmpc-dev \
+autoconf \
+build-essential \
+git-core
+# aptitude build-dep gcc-4.4
+\end{verbatim}
+
+\subsection{Installing on-chip debugger}
+
+At the time of writing, the \verb|openocd| version in the Debian stable
+distribution (0.3.1) is too old to support VESNA. We require at least version 0.5.0, so
+we will compile and install the package from source.
+
+Begin by downloading and unpacking the Debian source package (if the URLs below
+no longer work, you can find a suitable version at
+\url{http://packages.debian.org/wheezy/openocd}).
+
+\begin{verbatim}
+$ wget http://ftp.de.debian.org/debian/pool/main/o/openocd/openocd_0.5.0-1.dsc \
+http://ftp.de.debian.org/debian/pool/main/o/openocd/openocd_0.5.0.orig.tar.bz2 \
+http://ftp.de.debian.org/debian/pool/main/o/openocd/openocd_0.5.0-1.debian.tar.gz
+$ dpkg-source -x openocd_0.5.0-1.dsc
+\end{verbatim}
+
+Now build the package. \verb|dpkg-buildpackage| might display a message about
+missing build dependencies. In that case, install the missing packages that are
+listed in the error message using \verb|aptitude install| and re-run
+\verb|dpkg-buildpackage|.
+
+\begin{verbatim}
+$ cd openocd-0.5.0
+$ dpkg-buildpackage -uc -us
+$ cd ..
+\end{verbatim}
+
+Install the compiled package as root:
+
+\begin{verbatim}
+# dpkg -i openocd_0.5.0-1_amd64.deb
+\end{verbatim}
+
+Check the setup by running \verb|openocd -v|. It should return the following:
+
+\begin{verbatim}
+Open On-Chip Debugger 0.5.0 (2011-08-09-08:45)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.berlios.de/doc/doxygen/bugs.html
+\end{verbatim}
+
+\subsection{Installing cross-compiler toolchain}
+
+We will use a customized version of the \verb|summon-arm-toolchain| script to
+build a GNU toolchain targeting ARM Cortex M3 architecture.
+
+First we need to download the latest version of the script:
+
+\begin{verbatim}
+$ git clone https://github.com/avian2/summon-arm-toolchain.git
+\end{verbatim}
+
+Now run the script. This will download, compile and install the toolchain
+(binutils, gcc, gdb and newlib C library) into \verb|~/local|. If you
+would like to use a different directory, pass a different path to the
+\verb|-t| command-line argument.
+
+\begin{verbatim}
+$ cd summon-arm-toolchain
+$ ./summon-arm-toolchain -t ~/local
+\end{verbatim}
+
+You should now add \verb|~/local/bin| (or the directory you installed the toolchain
+in) to your PATH. This is best done by editing \verb|~/.bashrc| and adding a
+line like the following at the top:
+
+\begin{verbatim}
+export PATH="$HOME/local/bin:$PATH"
+\end{verbatim}
+
+Remember that this setting will take effect only after you open a new terminal window or
+a new login.
+
+To test the setup, try running \verb|arm-none-eabi-gcc --version|. It should have the
+following effect:
+
+\begin{verbatim}
+$ arm-none-eabi-gcc --version
+arm-none-eabi-gcc (GCC) 4.6.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+\end{verbatim}
+
+\subsection{Compiling libopencm3}
+
+Libopencm3 is a standard peripherals support library for ARM Cortex M3
+microcontrollers. The version used below contains patches for VESNA that have
+not yet been accepted up-stream.
+
+\begin{verbatim}
+$ git clone https://github.com/avian2/libopencm3.git
+\end{verbatim}
+
+Now compile and install the library. Adjust the DESTDIR value to the same prefix
+you used when installing the toolchain.
+
+\begin{verbatim}
+$ cd libopencm3
+$ make
+$ DESTDIR=~/local make install
+\end{verbatim}
+
+\subsection{Testing the setup}
+
+To test the setup we will compile, upload and debug a short program that blinks
+the yellow LED present on the VESNA core board and sends a message to debugger's
+serial port.
+
+First, download the source of the program:
+
+\begin{verbatim}
+$ git clone https://github.com/avian2/vesna-hellow-world.git
+\end{verbatim}
+
+Then compile it:
+
+\begin{verbatim}
+$ cd vesna-hello-world
+$ make
+\end{verbatim}
+
+And load it into microcontroller's flash. For this to work, you need to have an
+Olimex ARM-USB-OCD programmer connected to VESNA through the SND debug board.
+Make sure the power and JTAG connectors are securely attached.
+
+\begin{verbatim}
+$ make hello-world.u
+\end{verbatim}
+
+The yellow LED on the VESNA board should start blinking after programming is complete.
+To see messages sent to the serial port, you need to attach the serial
+connector on the Olimex ARM-USB-OCD to the VESNA's serial port.
+
+You then need to read the correct device file. If you don't have any
+other USB-to-serial adapters connected to the machine, this will usually be
+\verb|/dev/ttyUSB0|. The program sets the baud rate to 19200 bps, and we have to
+match that setting on the Linux side.
+
+\begin{verbatim}
+$ stty -F /dev/ttyUSB0 19200
+$ cat /dev/ttyUSB0
+\end{verbatim}
+
+You should now see a stream of \verb|Hello, world!| messages appear in the
+terminal. Of course, you can also use your serial terminal emulator of choice
+
+\subsection{Debugging setup}
+
+OpenOCD allows you to attach a GNU debugger instance to VESNA. This allows you
+to conveniently debug the code running on the microcontroller, for instance by
+manually inspecting memory contents or single stepping through code.
+
+We begin by starting OpenOCD in server mode.
+
+\begin{verbatim}
+$ openocd -f interface/olimex-arm-usb-ocd.cfg -f target/stm32f1x.cfg
+\end{verbatim}
+
+Then we can start GNU debugger and attach it to OpenOCD.
+
+\begin{verbatim}
+$ arm-none-eabi-gdb
+(gdb) target remote localhost:3333
+\end{verbatim}
+
+At this point we can start debugging the code that is already running on the
+microcontroller using the usual GDB commands. To reset the microcontroller, use:
+
+\begin{verbatim}
+(gdb) monitor reset halt
+(gdb) continue
+\end{verbatim}
+
+You can also program the microcontroller's flash directly from the debugger. For
+instance, to load the hello-world program, do:
+
+\begin{verbatim}
+(gdb) monitor reset halt
+(gdb) file hello-world.elf
+(gdb) load
+(gdb) monitor reset halt
+\end{verbatim}
+
+Note that to see the source of the libopencm3 functions correctly, you might
+need to adjust the source search path. Adjust the path in the command below to
+point to the location where you compiled libopencm3.
+
+\begin{verbatim}
+(gdb) directory ~/libopencm3/lib/stm32/f1
+\end{verbatim}
+
+\newpage
+
+\begin{thebibliography}{9}
+\bibitem{mm10}
+	% FIXME update reference manual to "VESNA" manual
+   Marko Mihelin, SensorLab VESNA open source development environment setup manual for Windows based development,
+   2011
+
+\end{thebibliography}
+
+\end{document}
