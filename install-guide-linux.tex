@@ -956,6 +956,15 @@ For bug reports, read
 	http://openocd.berlios.de/doc/doxygen/bugs.html
 \end{verbatim}
 
+Note that your user account usually needs to be a member of the group
+\verb|plugdev| in order to have access to the OCD programmer and other USB
+devices. You can ensure this by running the following command as root (replace
+\verb|foo| with your user name):
+
+\begin{verbatim}
+# adduser foo plugdev
+\end{verbatim}
+
 \subsection{Installing cross-compiler toolchain}
 
 We will use a customized version of the \verb|summon-arm-toolchain| script to
