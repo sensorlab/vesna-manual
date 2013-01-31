@@ -1116,6 +1116,52 @@ point to the location where you compiled libopencm3.
 (gdb) directory ~/libopencm3/lib/stm32/f1
 \end{verbatim}
 
+\subsection{Troubleshooting}
+
+This section tries to give solutions to common problems.  The list might be
+incomplete, so feel free to contact the author for including new entries in
+this section.
+
+\subsubsection{unable to open ftdi device: device not found}
+
+\verb|openocd| will report this error if initialization failed, even if
+the USB device itself was actually found. Common reasons are access denied
+errors due to bad device file permissions or ioctl errors because OpenOCD
+expects a different type of hardware.
+
+All instructions above assume you are using the Olimex ARM-USB-OCD
+programmer. Note that Olimex ARM-USB-OCD-H is a different device, requiring
+a different OpenOCD configuration.
+
+If you are using a different programmer, you have to set the
+\verb|OPENOCD_PARAMS| environment accordingly. For instance, for Olimex
+ARM-USB-OCD-H, the following line can be added to the top of the
+\verb|.bashrc| file:
+
+\begin{verbatim}
+export OPENOCD_PARAMS="-f interface/olimex-arm-usb-ocd-h.cfg \
+-f target/stm32f1x.cfg"
+\end{verbatim}
+
+Also note that at the time of writing, \verb|openocd| packages for Debian
+and Ubuntu do not include proper \verb|udev| rules for ARM-USB-OCD-H
+hardware and hence do not set correct permissions for device files in that
+case. This can be corrected by adding the following configuration to a file
+named \\ \verb|/etc/udev/rules.d/40-openocd.rules| (unplug the
+programmer beforehand):
+
+\begin{verbatim}
+ACTION!="add|change", GOTO="openocd_rules_end"
+SUBSYSTEM!="usb", GOTO="openocd_rules_end"
+ENV{DEVTYPE}!="usb_device", GOTO="openocd_rules_end"
+
+# Olimex ARM-USB-OCD-H
+ATTRS{idVendor}=="15ba", ATTRS{idProduct}=="002b", MODE="664", \
+GROUP="plugdev"
+
+LABEL="openocd_rules_end"
+\end{verbatim}
+
 \newpage
 
 \begin{thebibliography}{9}
