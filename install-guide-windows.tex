@@ -1,0 +1,137 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage[pdftex]{hyperref}
+
+\author{Marko Mihelin}
+\title{SensorLab VESNA open source development environment setup manual for Windows based development}
+
+\makeindex
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\thispagestyle{empty}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+This manual is for JSI Sensor Lab members and associates. The setup and usage of the open source development environment for the VSN platform is described in this document.  This manual is for Windows based development and has been successfully tested on Windows XP SP3 and Windows 7 32bit and 64bit.
+
+\subsection{Overview of the installation process}
+Here is the Overview of the installation process:
+\begin{enumerate}
+\item Install Cygwin
+\item Install the Codesourcery G++ tool-chain
+\item Install OpenOCD
+\item Install ST Flash Loader Demonstrator (Optional)
+\item Install Eclipse
+\item Install Eclipse plug-ins (GIT, tool-chain support, ...)
+\item Connect the debugger interface and install the drivers
+\item Download VESNA drivers, Build and Debug
+\end{enumerate}
+
+\section{Install Cygwin}
+Cygwin is a  Linux-like environment for Windows. We need it because the makefiles of the projects contain some Linux specific commands. You can download it from here \href{http://cygwin.com/}{http://cygwin.com/}. The version at the time of writing was 1.7.9. You can install it with default options. Make sure you add the "C:\textbackslash install\textbackslash dir\textbackslash cygwin\textbackslash bin" to your system PATH. You do this by right clicking on My Computer and clicking on Properties. Got to Advanced ? Environment Variables.
+
+Now find the variable PATH in the System Variables window, select it and click edit (Figure 1).
+
+At the end of the string of paths add a semicolon and the path to Cygwin install directory like in Figure 2. Make sure not to delete any preexisting paths in the Variable value field. Click OK.
+
+\section{Install Codesourcery G++ Lite tool-chain}
+The tool-chain contains the compiler linker and debugger for ARMv7M software development. The tool-chain can be download from here \href{http://www.codesourcery.com/sgpp/lite/arm/portal/subscription?@template=lite}{http://www.codesourcery.com/sgpp/lite/arm/portal/subscription?@template=lite}. Select the Target OS EABI version and download the IA32 Windows Installer.
+Start the installation.
+
+Chose an install folder name with no spaces (spaces can cause problems with Eclipse, and the debuger) (Figure 4).
+
+Select ?Modify PATH for all users?, so Eclipse can find the tool-chain (Figure 5).
+
+Finish the installation.
+
+\section{Install OpenOCD}
+OpenOCD is the interface between the hardware JTAG and the debugger, the current stable version is 0.5.0. The binary can be downloaded from here \href{http://www.freddiechopin.info/index.php/en/download/category/4-openocd}{http://www.freddiechopin.info/index.php/en/download/category/4-openocd}. Download the 0.5.0 version for your system (32Bit or 64bit Windows). Unzip the folder where you want to place OpenOCD. Then go to the unzip folder, sub-folder bin and rename openocd*.exe to openocd.exe. Now add openocd.exe to your PATH the same way you added cygwin.exe.
+
+\section{Install ST Flash Loader Demonstrator (Optional)}
+The Flash Loader can upload software to target microcontroller using only a com port. It can upload binary .bin or .s19 images. This is useful for programing the VSN platform when JTAG can not be used for instance when using the on-board FRAM. The Flash loader can be downloaded from ST \href{http://www.st.com/stonline/stappl/resourceSelector/app?page=resourceSelector&doctype=SW_DEMO&ClassID=1734}{ST Flash Loader Demonstartor}, reference: STM32F101xx and STM32F103xx Flash loader demonstrator. To initialize the VSN on-board bootloader you must push the button on the VSN for more then 3 seconds. Then use the Flash loader to connect and upload software to the VSN.
+
+\section{Install Eclipse IDE}
+Before installing Eclipse you must have the latest Java Run-time Environment installed. There were some issues with Java 1.6.0\_21 and Eclipse Helios that have been resolved in the newer Java releases.
+
+\subsection{Install Eclipse}
+Eclipse can be downloaded from here http://www.eclipse.org/downloads/, the newest release is not compatible with some of the plug-ins we are using so make sure you download the Helios release. Select the ?Eclipse IDE for C/C++ Developers? and download it, make sure you download the 32bit version since the 64bit version does not work with the tool-chain. Eclipse doesn?t need installation, just unzip in a desired location and run it. You are prompted for workspace location, this is were the settings and code are stored. You can select the default location. Make sure the path name doesn't contain any non-US characters and spaces. 
+
+\subsection{Install the GIT plug-in EGIT}
+Click on Help ? Install new software. In the ?Work with? drop down menu select ?--All Available Sites--?. Type subversive in the filter field and select the ?Subversive SVN Team Provider? (Figure 6). Click next and install it.
+
+Subversive is a plug-in that enables Eclipse to connect to a Subversion (SVN) version control server.
+
+\subsection{Install the GNU ARM Development support}
+Again go to the Install new software window and paste this URL ?http://gnuarmeclipse.sourceforge.net/updates? to the ?Work with?  line (Figure 7). Install the plug-in shown below.
+
+This plug-in adds automatic makefile creation capabilities and tool-chain preconfiguration  to Eclipse. It supports various opensource toolchains.
+\subsection{Install the Zylin CDT plug-in}
+To install the Zylin CDT plug-in go again to the  ?Install new software? window and paste this URL   ?http://opensource.zylin.com/zylincdt ? select the plug-in and install it (Figure 8).
+
+The Zylin CDT plug-in enables Eclipse to communicate with GDB debugger.
+
+\subsection{Install the EmbSys periphial register view plug-in}
+To install the EmbSys periphial register view plug-in go to the  ?Install new software? window and paste this URL ? http://embsysregview.sourceforge.net/update ? select the plug-in and install it (Figure 9).
+After installation go to Window ? Preferences ? C/C++ ? Debug ? EmbSys Register view to setup the plug-in. For Archictectur select cortex m3, for Vendor select STMicro and for Chip select STM32F10x\_HD\_VL click ok (Figure 10). To add the plugin into a view go to Window ? Show View ? Other... ? Debug and select EmbSys Register.  Now you can view and change the periphial registeras of the microcontroller when debugging (Figure 11).
+
+\section{Connect the debugger interface and install the drivers}
+n this section the installation of the hardware debugger interface on a 32bit and 64bit Windows is explained. Installation procedure is the same for 32bit and 64bit.
+1. First go to ?c:\textbackslash unzip\textbackslash directory\textbackslash OpenOCD\textbackslash drivers? and unzip ?libusb-win32\_ft2232\_driver-*.zip? to a convenient location. This is the open source USB JTAG driver.
+2. Now connect the debugger interface ARM-USB-OCD to the PC. When prompted for drivers (WinXP) use the open source driver that you've unzipped earlier (Figure 13, Figure 14 and Figure 15). In Windows 7 you have to go to ?Device Manager? and install the drivers manually (Figure 12). 
+One of the new devices is the JTAG interface and the other is the virtual COM port. Both are named ?Olimex OpenOCD JTAG? in  Device Manager. The JTAG Interface requires the open source USB JTAG driver and the virtual COM port the driver supplied with the  ARM-USB-OCD CD.
+
+Usually the first entry is the JTAG interface. You have to install the open source JTAG driver first. If Windows reports that it failed to find a driver for the device in supplied location than you probably tried to install the open source JTAG driver to the virtual COM port device. In this case just try to install the driver to the second device.
+
+3. Select the location where you've unzip the open source JTAG driver (Figure 15). Click next and the installation will start.
+
+4. The open source JTAG driver has been installed. Now another hardware found window will pop up. This is for the virtual COM port. Use the drivers on the CD supplied with  ARM-USB-OCD USB debugger to install it.
+
+5. After the COM port is installed another hardware found window will pop-up. This is for the ARM-USB-OCD USB Serial Port, again use the drivers on the supplied CD to install it. Windows 7 should install the serial port driver automatically, if it doesn't a USB serial device will be shown in Device Manager (Figure 16). Use the CD to install the driver.
+
+If everything was done correctly than all the needed drivers were installed.
+
+\section{Download VESNA drivers, Build and Debug}
+This chapter explains how to configure the SVN plug-in, download the ?HelloWrold? project,  compile the source code, download the build binary file to the VSN and start a debug session. 
+
+\subsection{Download  VESNA drivers from the GITHUB}
+The VSN HelloWorld is on SVN server. To download it to your computer and into Eclipse open Eclipse go to File ? Import ? SVN ? Project from SVN. A SVN connector selection windows appears (Figure 17), this happens only the first time because we haven't defined any SVN connectors yet. Select the SVN kit 1.3.2 as shown on the picture below or any other connector that is compatible with SVN 1.6.x (look at the info for connectors) and click Finish.
+
+After Eclipse is restarted repeat the import step, now a SVN checkout window will appear (Figure 18). Enter the SVN URL, for VSN HelloWorld enter ?http://xpack.ijs.si/svn/vsnhelloworld/? , for Contiki HelloWorld enter ?http://xpack.ijs.si/svn/vsncontiki/?. Fill out the authentication information and click next.
+In the next window click on ?Head Revision? and Finish (Figure 19).
+
+Select ?Find projects in the children of the selected resource? and click next (Figure 20).
+Now select the HelloWorldVSNEclipse project and ?Check out as a project into workspace? than click finish (Figure 21).
+
+All the project files are now downloaded from the SVN server. Now you should see the hello world source tree on the left (Figure 23).
+
+\subsection{Configure the debug tools shortcuts}
+Before you can start programing and debugging add the debugger tools to your favorites. You do this by clicking on  arrow next to  and than ?Organize Favorites...? (Figure 24)
+
+Now click ?Add...? , select both tools you see and click OK, OK. Now you have the external tools in favorites. Do the same thing for the ?Debug configuration? by clicking  on the arrow next to the   . Again click on ?Organize Favorites...?, ?Add...? and select both configurations.
+
+\subsection{Compile the source}
+Now we can compile the hello world project and test it. There is a menu on the right (Figure 25). Find the make target icon  and click it.Open the helloworld folder and double-click on the ?Build HelloWorld?. The project starts building.
+When the build is successful we can upload the project to the VSN and debug it. 
+
+\subsection{Upload the project and start debug}
+Now connect the board to the debugger and power supply. Click on the arrow next to the ?External Tools? icon  and select ?OpenOCD-ARM-USB-OCD Debug?. If all is working you should see something like this in the ?Console? window:
+
+This means that the debugger hardware is found and it is connected to the VSN. Now start the debugger by clicking on the arrow next to ?Debugger configuration? icon  and click on the ?VSNHelloWorld Load and Debug?. This will upload the software to VSN and start the debugger. You are prompted to switch the view to the ?Debug? view, click yes. Now you should see something like this (Figure 26):
+
+Congratulations, you have successfully established the Sensor Lab development environment.
+
+\section{End note}
+For any questions, comments or corrections feel free to contact the author on e-mail marko[dot]mihelin[at]gmail[dot]com or in person at Sensor Lab, or just add  comments or corrections to the SensorLab Trac wiki under SensorLab VSN Development Environment Manual .
+
+\section{Literature}
+
+\end{document}
