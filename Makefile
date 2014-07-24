@@ -1,4 +1,4 @@
-DOCS = install-guide-linux.tex
+DOCS = install-guide-linux.tex install-guide-windows.tex
 
 LATEX = latex 
 PDFLATEX = pdflatex
@@ -26,7 +26,7 @@ all: $(DOCS:.tex=.pdf)
 		$(<:.tex=.log) >> $@
 
 clean:
-	rm -f *.d *.aux *.dvi *.log *.lof *.out *.toc *.pdf
+	rm -f *.d *.aux *.dvi *.log *.lof *.out *.toc *.pdf *.idx
 
 .PHONY: all clean
 
